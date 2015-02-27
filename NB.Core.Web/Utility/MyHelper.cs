@@ -34,7 +34,13 @@ using NB.Core.Web.Enums;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.Text;
-
+using System.Runtime.Serialization.Json;
+using System.Net.Mail;
+using System.Net;
+using System.ComponentModel;
+using System.Reflection;
+using System.Linq;
+using System.Threading;
 namespace NB.Core.Web.Utility
 {
     public static class MyHelper
@@ -402,7 +408,7 @@ namespace NB.Core.Web.Utility
 
         public static string FixString (string original)
         {
-            string originalFix = original.Replace("\r", string.Empty).Replace("\n", string.Empty);
+            string originalFix = original.Replace("\r", string.Empty).Replace("\n", string.Empty).Replace("\t", string.Empty);
             return Regex.Replace(originalFix, @"\s+", string.Empty);
         }
 
@@ -411,6 +417,87 @@ namespace NB.Core.Web.Utility
             string fixSymbols = MyHelper.FixString(str);
             var tickers = fixSymbols.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
             return tickers;
+        }
+
+        public static string ExtractPattern(string content, string pattern)
+        {
+            var match = Regex.Match(content, pattern);
+            var val = match.Groups[1].Value;//Groups["ticker"]
+            return val;
+        }
+
+        public static T FromJson<T>(string json)
+        {        
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(json)))
+            {
+                var deserializer = new DataContractJsonSerializer(typeof(T));
+                return (T)deserializer.ReadObject(ms);
+            }
+        }
+
+        public static string ToJson<T>(T data)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                var serializer = new DataContractJsonSerializer(typeof(T));
+                serializer.WriteObject(ms, data);
+                return Encoding.Default.GetString(ms.ToArray());
+            }
+        }
+
+        public static void SendTextMessage(string subject, string message, long telephoneNumer, CarrierGateWay carrier)
+        {
+            //http://martinfitzpatrick.name/list-of-email-to-sms-gateways/
+            // login details for gmail acct.
+            const string sender = "adamshe@gmail.com";
+            const string password = "googwealthy9!!";
+
+            // find the carriers sms gateway for the recipent. txt.att.net is for AT&T customers.
+            string carrierGateway = MyHelper.GetDescriptionFromEnumValue(carrier);
+
+            // this is the recipents number @ carrierGateway that gmail use to deliver message.
+            string recipent = string.Concat(new object[]{
+            telephoneNumer,
+            '@',
+            carrierGateway
+            });
+
+            // form the text message and send
+            using (MailMessage textMessage = new MailMessage(sender, recipent, subject, message))
+            {
+                using (SmtpClient textMessageClient = new SmtpClient("smtp.gmail.com", 587))
+                {
+                  //  var token = new CancellationToken();
+                    textMessageClient.UseDefaultCredentials = false;
+                    textMessageClient.EnableSsl = true;
+                    textMessageClient.Credentials = new NetworkCredential(sender, password);
+                    textMessageClient.Send(textMessage);//, token);
+                }
+            }
+        }
+
+        public static string GetDescriptionFromEnumValue(Enum value)
+        {
+            DescriptionAttribute attribute = value.GetType()
+                .GetField(value.ToString())
+                .GetCustomAttributes(typeof(DescriptionAttribute), false)
+                .SingleOrDefault() as DescriptionAttribute;
+            return attribute == null ? value.ToString() : attribute.Description;
+        }
+
+        public static T GetEnumValueFromDescription<T>(string description)
+        {
+            var type = typeof(T);
+            if (!type.IsEnum)
+                throw new ArgumentException();
+            FieldInfo[] fields = type.GetFields();
+            var field = fields
+                            .SelectMany(f => f.GetCustomAttributes(
+                                typeof(DescriptionAttribute), false), (
+                                    f, a) => new { Field = f, Att = a })
+                            .Where(a => ((DescriptionAttribute)a.Att)
+                                .Description == description).SingleOrDefault();
+            return field == null ? default(T) : (T)field.Field.GetRawConstantValue();
         }
         //private MyHelper() { }
         //static MyHelper() { }

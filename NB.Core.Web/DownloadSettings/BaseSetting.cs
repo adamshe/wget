@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 
@@ -10,8 +11,9 @@ namespace NB.Core.Web.DownloadSettings
         public abstract string GetUrl(string ticker);
 
         public abstract string GetTickerFromUrl(string url);
-        public abstract string GetFileName(string ticker);
-        public abstract string GetFileName();
+        public virtual string GetFileName(string ticker) {return string.Format("{0}-{1}.txt",ticker, DateTime.Now.ToString("yyyyMMdd"));}
+        public virtual string GetFileName()
+        { return string.Format("{0}-{1}.txt", Ticker, DateTime.Now.ToString("yyyyMMdd")); }
 
        // public abstract object Clone();
         public string Ticker {get; set;}

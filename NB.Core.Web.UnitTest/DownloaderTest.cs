@@ -63,7 +63,6 @@ namespace NB.Core.Web.UnitTest
         }
 
         [TestMethod]
-
         public async Task YahooQuotesDownloaderTest()
         {
             var setting = new YahooQuotesDownloadSettings();
@@ -77,23 +76,73 @@ namespace NB.Core.Web.UnitTest
 
             setting.IDs = MyHelper.GetStringToken(tickers, new string[] { ";", "," });
             var downloader = new YahooQuotesDownloader(setting);
-            var results = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
+            var result = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
             
 
-            results.SortBy(QuoteProperty.PercentChangeFromTwoHundreddayMovingAverage);
-            foreach (var result in results.Items)
+            result.SortBy(QuoteProperty.PercentChangeFromTwoHundreddayMovingAverage);
+            foreach (var item in result.Items)
             {
                 Debug.WriteLine(string.Format("{0}     {1}               {2}           {3}          {4}          {5}         {6}", 
-                    result.ID.PadRight(5),
-                    result.Name.PadLeft(17),
-                    result.LastTradePriceOnly.ToString().PadLeft(9),
-                    result.ChangeInPercent.ToString().PadLeft(9),
-                    result[QuoteProperty.OneyrTargetPrice].ToString().PadLeft(8),
-                    result[QuoteProperty.PercentChangeFromFiftydayMovingAverage].ToString().PadLeft(8),
-                    result[QuoteProperty.PercentChangeFromTwoHundreddayMovingAverage].ToString().PadLeft(8)
+                    item.ID.PadRight(5),
+                    item.Name.PadLeft(17),
+                    item.LastTradePriceOnly.ToString().PadLeft(9),
+                    item.ChangeInPercent.ToString().PadLeft(9),
+                    item[QuoteProperty.OneyrTargetPrice].ToString().PadLeft(8),
+                    item[QuoteProperty.PercentChangeFromFiftydayMovingAverage].ToString().PadLeft(8),
+                    item[QuoteProperty.PercentChangeFromTwoHundreddayMovingAverage].ToString().PadLeft(8)
                     ));
             }
         }
+
+        [TestMethod]
+        public async Task TrefisDownloaderTest ()
+        {
+            var setting = new TrefisSetting();
+            var downloader = new TrefisDownloader(setting);
+            var result = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
+            foreach (var item in result.Items)
+            {
+                Debug.WriteLine(string.Format("{0}     {1}        {2}       {3}       {4}      {5}              {6}",
+                   item.Ticker.PadRight(5),
+                   item.CompanyName.PadRight(29),
+                   item.TrefisTarget.ToString("c").PadLeft(9),
+                   item.MarketPrice.ToString("c").PadLeft(9),
+                   item.PriceGap.ToString("P").PadLeft(9),
+                   item.Sector.ToString().PadRight(18),
+                   item.Industry.ToString().PadRight(18)
+                //   item.Bearishness.ToString().PadLeft(8)
+                   ));
+            }
+
+        }
+
+        [TestMethod]
+        public void SendSMS ()
+        {
+            long[] friendTmus = { 7184042681,7186668495, 8483912608 };
+            long[] friendAtt = { 9172079948 };
+            var msg = @"亲爱的朋友, 您将自动成为Adam开发的交易系统的首批用户通知子系统
+                 该系统现在主要研究是分析明牌，从重要网站数据采集，不犯方向性错误。主要关注四种策略，好骑师，灰马，BUYOUT和庄家自救，4种占齐胜算是95%以上，
+                 系统主要是避免人性的弱点和心情的起伏，不会犯低级错误，
+                 后面阶段将用NEURAL NETWORK建立预测系统，定价，趋势的提前预见，ORDER MANAGEMENT，机会寻找，胜算估计，自动交易。
+                 BACKEND可能会用WEB API， 前台可能会是SPA";
+            foreach (var phone in friendTmus)
+            {
+             //   MyHelper.SendTextMessage("慢点开车", "想", 7184042681, CarrierGateWay.TMOBILE);
+             //   MyHelper.SendTextMessage("Test", "Hello, 你受到这封信，是因为你认识Adam，开发一个交易系统的通知子系统", 9172079948, CarrierGateWay.ATT);
+                MyHelper.SendTextMessage("订阅服务 : ",
+                msg, phone, CarrierGateWay.TMOBILE);
+            }
+
+            foreach (var phone in friendAtt)
+            {
+                //   MyHelper.SendTextMessage("慢点开车", "想", 7184042681, CarrierGateWay.TMOBILE);
+                //   MyHelper.SendTextMessage("Test", "Hello, 你受到这封信，是因为你认识Adam，开发一个交易系统的通知子系统", 9172079948, CarrierGateWay.ATT);
+                MyHelper.SendTextMessage("订阅服务 : ", msg
+                    , phone, CarrierGateWay.ATT);
+            }
+        }
+
         protected IEnumerable<Task> GetScheduledTasks()
         {
             yield break;
