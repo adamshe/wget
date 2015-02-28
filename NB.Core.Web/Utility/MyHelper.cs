@@ -476,6 +476,12 @@ namespace NB.Core.Web.Utility
             }
         }
 
+        public static T GetAttributeValue<T> (Type t, Attribute attribute) where T: Attribute
+        {
+            var filedAttr = Attribute.GetCustomAttributes(t).Where(attr => attr is T).FirstOrDefault();
+            return (T)filedAttr;
+        }
+
         public static string GetDescriptionFromEnumValue(Enum value)
         {
             DescriptionAttribute attribute = value.GetType()
@@ -499,6 +505,23 @@ namespace NB.Core.Web.Utility
                                 .Description == description).SingleOrDefault();
             return field == null ? default(T) : (T)field.Field.GetRawConstantValue();
         }
+
+        public static string NumerizeString (string str)
+        {
+            var norm = str.Trim();
+            if (norm.EndsWith("%"))
+            {
+                double num = double.Parse(norm.Replace("%", "")) / 100.0;
+                norm= num.ToString("f4");
+            }
+            else if (norm == "-")
+                norm = int.MinValue.ToString();
+
+            return norm;
+        }
+
+        public static bool IsNullable<T>(T t) { return false; }
+        public static bool IsNullable<T>(T? t) where T : struct { return true; }
         //private MyHelper() { }
         //static MyHelper() { }
     }

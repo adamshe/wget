@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Web;
 using System.Xml.Linq;
 
 
@@ -412,7 +413,8 @@ namespace NB.Core.Web.Xml
         private bool IsValidTagChar(char c) { return c == '_' || c == '-' || char.IsLetterOrDigit(c); }
         public static string DecodeXml(string escapedTxt)
         {
-            if (escapedTxt.Length > 4)
+            return HttpUtility.HtmlDecode(escapedTxt);
+           /* if (escapedTxt.Length > 4)
             {
                 string newTxt = string.Empty;
                 bool isInSequence = false;
@@ -471,9 +473,12 @@ namespace NB.Core.Web.Xml
             {
                 return escapedTxt;
             }
+            * */
         }
         public static string EncodeXml(string unescapedTxt)
         {
+            return HttpUtility.HtmlEncode(unescapedTxt);
+            /*
             string newTxt = string.Empty;
             if (unescapedTxt.Length > 0)
             {
@@ -503,6 +508,7 @@ namespace NB.Core.Web.Xml
                 }
             }
             return newTxt;
+             * */
         }
         private XObject FindParent(XObject child, XParseName parentName)
         {

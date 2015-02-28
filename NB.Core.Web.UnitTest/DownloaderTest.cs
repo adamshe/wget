@@ -7,9 +7,8 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
 using NB.Core.Web.Enums;
-using NB.Core.Web.Models;
 using NB.Core.Web.Utility;
-
+using System.Linq;
 namespace NB.Core.Web.UnitTest
 {
     [TestClass]
@@ -117,10 +116,31 @@ namespace NB.Core.Web.UnitTest
         }
 
         [TestMethod]
+        public async Task FinvizDetailsDownloaderTest()
+        {
+            var setting = new FinvizDetailsSetting("AAPL");
+            var downloader = new FinvizDetailsDownloader(setting);
+            var result = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
+            var stringPropertyNamesAndValues = result.GetType()
+                .GetProperties()
+               // .Where(pi => pi.PropertyType == typeof(string) && pi.GetGetMethod() != null)
+                .Select(pi => new
+                {
+                    Name = pi.Name,
+                    Value = pi.GetGetMethod().Invoke(result, null)
+                });
+
+            foreach (var pair in stringPropertyNamesAndValues)
+            {
+                Debug.WriteLine("Name: {0}             -      Value: {1}", pair.Name.PadRight(26), pair.Value.ToString().PadLeft(6));
+            }
+        }
+
+        [TestMethod]
         public void SendSMS ()
         {
-            long[] friendTmus = { 7184042681,7186668495, 8483912608 };
-            long[] friendAtt = { 9172079948 };
+            long[] friendTmus = { 7184042681,7186668495  };
+            long[] friendAtt = { 9172079948,8483912608 };
             var msg = @"亲爱的朋友, 您将自动成为Adam开发的交易系统的首批用户通知子系统
                  该系统现在主要研究是分析明牌，从重要网站数据采集，不犯方向性错误。主要关注四种策略，好骑师，灰马，BUYOUT和庄家自救，4种占齐胜算是95%以上，
                  系统主要是避免人性的弱点和心情的起伏，不会犯低级错误，
