@@ -9,19 +9,53 @@ using System.IO;
 using NB.Core.Web.Enums;
 using NB.Core.Web.Utility;
 using System.Linq;
+using NB.Core.Web.Extensions;
 namespace NB.Core.Web.UnitTest
 {
     [TestClass]
     public class DownloaderTest
-    {
-        string tickers = @"^TNX,TQQQ";/*,BIB,CURE,AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
+    {//^TNX,TQQQ";/*
+        string tickers = @"BIB,CURE,AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
             FB,LNKD,TWTR,JD,JMEI,TKMR,CELG,REGN,BIIB,ICPT,PCYC,INCY,DATA,NOW,GILD,SPLK,TSO,
             LNG,EOG,APC,GPRO,NUAN,RCL,MCO,DFS,AXP,MA,V,GS,BAC,JPM,
-            C,JUNO,KITE,BLUE,GMCR";*/
+            C,JUNO,KITE,BLUE,GMCR";
 
         string index = @"SPY,IWM,TQQQ,BIB,CURE,XLE,XLF,EEM,FXI,RTH, XTN";//TZA,TNA,
+
         [TestMethod]
-        public  async Task YahooHistoryCsvHelperDownloaderTest()
+        public void DateTimeTest()
+        {//https://msdn.microsoft.com/en-us/library/zdtaw1bw%28v=vs.110%29.aspx
+            Debug.WriteLine(DateTime.Now.ThisMonthNthOf(3, DayOfWeek.Friday));
+
+            foreach (var date in DateTime.Now.ThisYearNthOf(3, DayOfWeek.Friday))
+            {
+                Debug.WriteLine(date.ToString("D"));
+            }
+            
+        }
+
+        [TestMethod]
+        public async Task YahooHistoryCsvStreamDownloaderTest()
+        {
+            var task = GetScheduledTasks();
+            Debug.Write(task);
+            var setting = new YahooHistoryCsvSetting("QQQ");
+            setting.Start = new DateTime(2014,5,1);
+            setting.End = new DateTime(2014, 12, 31);
+            var downloader = new YahooHistoryCsvDownloader(setting);
+            var url = setting.GetUrl();
+            Debug.WriteLine(url);
+            var data = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
+            var datas = await downloader.BatchDownloadObjectsStreamTaskAsync(setting.GetUrls("AAPL,YHOO,MSFT,GOOGL")).ConfigureAwait(false);
+//BatchDownloadObjectsStreamTaskAsync //BatchDownloadObjectsTaskAsync
+            Debug.WriteLine(data.ToString());
+            foreach (var data1 in datas)
+                Debug.WriteLine(data1.ToString());
+
+        }
+
+        [TestMethod]
+        public  async Task YahooHistoryCsvDownloaderTest()
         {
             var task = GetScheduledTasks();
             Debug.Write(task);
@@ -86,9 +120,9 @@ namespace NB.Core.Web.UnitTest
                     item.Name.PadLeft(17),
                     item.LastTradePriceOnly.ToString().PadLeft(9),
                     item.ChangeInPercent.ToString().PadLeft(9),
-                    item[QuoteProperty.OneyrTargetPrice].ToString().PadLeft(8),
-                    item[QuoteProperty.PercentChangeFromFiftydayMovingAverage].ToString().PadLeft(8),
-                    item[QuoteProperty.PercentChangeFromTwoHundreddayMovingAverage].ToString().PadLeft(8)
+                    (item[QuoteProperty.OneyrTargetPrice]??0).ToString().PadLeft(8),
+                    (item[QuoteProperty.PercentChangeFromFiftydayMovingAverage]??0).ToString().PadLeft(8),
+                    (item[QuoteProperty.PercentChangeFromTwoHundreddayMovingAverage]??0).ToString().PadLeft(8)
                     ));
             }
         }
@@ -158,7 +192,7 @@ namespace NB.Core.Web.UnitTest
             }
         }
 
-        [TestMethod]
+      //  [TestMethod]
         public void SendSMS ()
         {
             long[] friendTmus = { 7184042681,7186668495  };

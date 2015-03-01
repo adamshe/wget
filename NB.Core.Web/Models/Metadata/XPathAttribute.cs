@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NB.Core.Web.Utility
+namespace NB.Core.Web.Models.Metadata
 {
     [AttributeUsage(System.AttributeTargets.Property)]
     public class XPathAttribute : Attribute

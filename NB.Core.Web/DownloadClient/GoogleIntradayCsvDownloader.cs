@@ -45,7 +45,7 @@ namespace NB.Core.Web.DownloadClient
                
             using (var csvReader = new CsvReader(sr))
             {
-                csvReader.Configuration.RegisterClassMap<PriceDataYahooMapping>();
+                csvReader.Configuration.RegisterClassMap<PriceDataGoogleMapping>();
                 while (csvReader.Read())
                 {
                     var data = csvReader.GetRecord<PriceData>();
@@ -80,7 +80,7 @@ namespace NB.Core.Web.DownloadClient
                 reader.ReadLine();
                 using (var csvReader = new CsvReader(reader))
                 {
-                    csvReader.Configuration.RegisterClassMap<PriceDataYahooMapping>();
+                    csvReader.Configuration.RegisterClassMap<PriceDataGoogleMapping>();
                     while (csvReader.Read())
                     {
                         var data = csvReader.GetRecord<PriceData>();

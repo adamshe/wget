@@ -9,7 +9,8 @@ using System.Collections.Generic;
 using NB.Core.Web.DownloadSettings;
 using System.Text.RegularExpressions;
 using System.Net;
-using System.Net.Http;
+using System.Diagnostics;
+using NB.Core.Web.Extensions;
 namespace NB.Core.Web.DownloadClient
 {
     public abstract class BaseDownloader<T> : IDownload<T>, IBatchDownload<T>, IPostDownLoad<T>
@@ -48,6 +49,21 @@ namespace NB.Core.Web.DownloadClient
             T obj = ConvertResult(contentStr, ticker);
             return obj;
         }
+
+        protected async Task<StreamReader> DownloadStreamTaskAync()
+        {
+            string url = _setting.GetUrlInternal();
+            var response = await _httpClient.Value.GetStreamAsync(url);
+            var reader = new StreamReader(response);
+
+            return reader;
+        }
+
+        public async Task<T> DownloadObjectStreamTaskAsync()
+        {
+            string url = _setting.GetUrlInternal();
+            return await DownloadObjectStreamTaskAsync(url);
+        }            
 
         public async Task<T> DownloadObjectStreamTaskAsync(string url)
         {
@@ -120,7 +136,7 @@ namespace NB.Core.Web.DownloadClient
 
         public BaseSetting Setting { get { return _setting; } set { _setting = value; } }
 
-        public int ParallelCapacity { get { return Environment.ProcessorCount * 2; } }
+        public int ParallelCapacity { get { return Environment.ProcessorCount; } }
 
         #region Batch Download
 
@@ -128,17 +144,61 @@ namespace NB.Core.Web.DownloadClient
         {
             if (urls == null)
                 throw new ArgumentNullException("urls is null");
-            return await urls.ForEachAsync(ParallelCapacity, url => DownloadFileTaskAsync(url));
+            IEnumerable<FileInfo> output = null;
+            try
+            {
+                output =await urls.ForEachAsync(ParallelCapacity, url => DownloadFileTaskAsync(url));
+               
+            }
+            catch (Exception ex)
+            {
+                Debug.Write(ex.Message);
+            }
+            return output;
         }
 
         public async Task<IEnumerable<T>> BatchDownloadObjectsTaskAsync(IEnumerable<string> urls)
         {            
             if (urls == null)
                 throw new ArgumentNullException("urls is null");
-            IEnumerable<T> output = await urls.ForEachAsync<string, T>(ParallelCapacity, url => DownloadObjectTaskAsync(url));
+            IEnumerable<T> output = null;
+            try
+            {
+                output = await urls.ForEachAsync<string, T>(ParallelCapacity, url => DownloadObjectTaskAsync(url));
+            }
+            catch (Exception ex)
+            {
+                Debug.Write (ex.Message);
+            }
             return output;
         }
 
+        public async Task<IEnumerable<T>> BatchDownloadObjectsStreamTaskAsync(IEnumerable<string> urls)
+        {
+
+            if (urls == null)
+                throw new ArgumentNullException("urls is null");
+            IEnumerable<T> output = null;
+            try
+            {
+                output = await urls.ForEachAsync<string, T>(ParallelCapacity, url => DownloadObjectStreamTaskAsync(url));
+            }
+            catch (Exception ex)
+            {
+                Debug.Write(ex.Message);
+            }
+            return output;
+            //if (urls == null)
+            //    throw new ArgumentNullException("urls is null");
+            //var list = new List<IEnumerable<T>>();
+            //foreach (var url in urls)
+            //{
+            //    var result = await DownloadObjectStreamTaskAsync(url);
+            //    list.Add(result);
+            //}
+            //IEnumerable<T> output = await urls.ForEachAsync<T>(url => DownloadObjectStreamTaskAsync(url));
+            //return list;
+        }
         #endregion
 
         #region IPostDownload

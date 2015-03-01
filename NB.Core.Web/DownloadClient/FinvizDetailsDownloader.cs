@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NB.Core.Web.DownloadClient;
 using NB.Core.Web.Models;
 using NB.Core.Web.Utility;
 using NB.Core.Web.Xml;
 using NB.Core.Web.DownloadSettings;
-using System.Globalization;
 using System.IO;
+using NB.Core.Web.Models.Metadata;
 
 namespace NB.Core.Web.DownloadClient
 {

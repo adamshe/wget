@@ -1,11 +1,7 @@
-﻿using NB.Core.Web.Utility;
+﻿using NB.Core.Web.Models.Metadata;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace NB.Core.Web.Models
