@@ -9,6 +9,7 @@ using NB.Core.Web.Utility;
 using NB.Core.Web.Xml;
 using NB.Core.Web.DownloadSettings;
 using System.Globalization;
+using System.IO;
 
 namespace NB.Core.Web.DownloadClient
 {
@@ -19,7 +20,11 @@ namespace NB.Core.Web.DownloadClient
         {
 
         }
-
+        
+        protected override FinvizCompanyDetails ConvertResult(StreamReader sr, string ticker = "")
+        {
+            throw new NotImplementedException("stream is only for csv files.");
+        }
         //http:/table/regexhero.net/tester/
         protected override FinvizCompanyDetails ConvertResult(string contentStr, string ticker = "")
         {

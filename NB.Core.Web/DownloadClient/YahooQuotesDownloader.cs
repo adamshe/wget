@@ -2,12 +2,8 @@
 using NB.Core.Web.Models;
 using NB.Core.Web.Utility;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace NB.Core.Web.DownloadClient
 {
@@ -17,6 +13,11 @@ namespace NB.Core.Web.DownloadClient
             : base(setting)
         {
             
+        }
+
+        protected override YahooQuotesResult ConvertResult(StreamReader sr, string ticker = "")
+        {
+            throw new NotImplementedException("stream is only for csv files.");
         }
 
         protected override YahooQuotesResult ConvertResult(string contentStr, string ticker = "")

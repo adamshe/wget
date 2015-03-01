@@ -21,7 +21,14 @@ namespace NB.Core.Web.Models
 
         public void SortBy (QuoteProperty property)
         {
-            base.Items = base.Items.OrderBy(item => ((YahooQuotesData)item)[property]).ToArray();
+            try
+            {
+                base.Items = base.Items.OrderBy(item => ((YahooQuotesData)item)[property] ?? double.MinValue ).ToArray();
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         internal YahooQuotesResult(YahooQuotesData[] items, YahooQuotesDownloadSettings settings)

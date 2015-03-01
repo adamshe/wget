@@ -9,6 +9,16 @@ namespace NB.Core.Web.DownloadSettings
 {
 	public class YahooHistoryCsvSetting : BaseSetting
 	{
+		/*
+		//http://table.finance.yahoo.com/table.csv?s={0}&a={1}&b={2}&c={3}&d={4}&e={5}&f={6}&g=d&ignore=.csv
+		 * 
+		 * You can ask the financial api, in some way like that:
+
+http://finance.yahoo.com/d/quotes.csv?s=
+And the historical data you can get by:
+
+http://finance.yahoo.com/q/hp?s=
+		 * */
 		public const string YahooCsvStr = "http://ichart.finance.yahoo.com/table.csv?s={0}&d=8&e=12&g=d&a=0&b=29&c={1}&f={2}&ignore=.csv";
 		public YahooHistoryCsvSetting (string ticker)
 		{

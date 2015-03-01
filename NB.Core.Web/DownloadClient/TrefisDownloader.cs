@@ -3,10 +3,10 @@ using NB.Core.Web.Models;
 using NB.Core.Web.Utility;
 using NB.Core.Web.Xml;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Runtime.Serialization.Json;
 using System.Linq;
 using System.Web;
+using System;
+using System.IO;
 namespace NB.Core.Web.DownloadClient
 {
     public class TrefisDownloader : BaseDownloader<TrefisCompanyCoveredInfoResult>
@@ -14,6 +14,11 @@ namespace NB.Core.Web.DownloadClient
         public TrefisDownloader(BaseSetting setting): base(setting)
         {
 
+        }
+
+        protected override TrefisCompanyCoveredInfoResult ConvertResult(StreamReader sr, string ticker = "")
+        {
+            throw new NotImplementedException("stream is only for csv files.");
         }
         
         protected override TrefisCompanyCoveredInfoResult ConvertResult(string contentStr, string ticker = "")

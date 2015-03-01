@@ -36,6 +36,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -50,14 +52,21 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="DownloaderTest.cs" />
+    <Compile Include="Downloader\DownloaderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NB.Core.Toolkit\NB.Core.Toolkit.csproj">
+      <Project>{987afd5b-3a0f-484b-805a-687db80323aa}</Project>
+      <Name>NB.Core.Toolkit</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NB.Core.Web\NB.Core.Web.csproj">
       <Project>{0c524540-0b5b-40f9-a094-9061c7ebc8a2}</Project>
       <Name>NB.Core.Web</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="CSV\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

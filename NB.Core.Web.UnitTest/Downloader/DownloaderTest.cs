@@ -14,18 +14,18 @@ namespace NB.Core.Web.UnitTest
     [TestClass]
     public class DownloaderTest
     {
-        string tickers = @"TQQQ,BIB,CURE,AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
+        string tickers = @"^TNX,TQQQ";/*,BIB,CURE,AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
             FB,LNKD,TWTR,JD,JMEI,TKMR,CELG,REGN,BIIB,ICPT,PCYC,INCY,DATA,NOW,GILD,SPLK,TSO,
             LNG,EOG,APC,GPRO,NUAN,RCL,MCO,DFS,AXP,MA,V,GS,BAC,JPM,
-            C,JUNO,KITE,BLUE,GMCR";
+            C,JUNO,KITE,BLUE,GMCR";*/
 
         string index = @"SPY,IWM,TQQQ,BIB,CURE,XLE,XLF,EEM,FXI,RTH, XTN";//TZA,TNA,
         [TestMethod]
-        public  async Task YahooHistoryCsvDownloaderTest()
+        public  async Task YahooHistoryCsvHelperDownloaderTest()
         {
             var task = GetScheduledTasks();
             Debug.Write(task);
-            var setting = new YahooHistoryCsvSetting("AAPL");
+            var setting = new YahooHistoryCsvSetting("QQQ");
             var downloader = new YahooHistoryCsvDownloader(setting);
             var url = setting.GetUrl();
             Debug.WriteLine(url);
@@ -116,6 +116,29 @@ namespace NB.Core.Web.UnitTest
         }
 
         [TestMethod]
+        public async Task FinvizDetailsBatchDownloaderTest()
+        {
+            var setting = new FinvizDetailsSetting("AAPL");
+            var downloader = new FinvizDetailsDownloader(setting);
+            var results = await downloader.BatchDownloadObjectsTaskAsync(setting.GetUrls(tickers)).ConfigureAwait(false);
+            foreach (var result in results)
+            {
+                var stringPropertyNamesAndValues = result.GetType()
+                    .GetProperties()
+                    .Select(pi => new
+                    {
+                        Name = pi.Name,
+                        Value = pi.GetGetMethod().Invoke(result, null)
+                    });
+
+                foreach (var pair in stringPropertyNamesAndValues)
+                {
+                    Debug.WriteLine("Name: {0}                   -      Value: {1}", pair.Name.PadRight(36), pair.Value.ToString().PadLeft(6));
+                }
+            }
+        }
+
+        [TestMethod]
         public async Task FinvizDetailsDownloaderTest()
         {
             var setting = new FinvizDetailsSetting("AAPL");
@@ -123,7 +146,6 @@ namespace NB.Core.Web.UnitTest
             var result = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
             var stringPropertyNamesAndValues = result.GetType()
                 .GetProperties()
-               // .Where(pi => pi.PropertyType == typeof(string) && pi.GetGetMethod() != null)
                 .Select(pi => new
                 {
                     Name = pi.Name,

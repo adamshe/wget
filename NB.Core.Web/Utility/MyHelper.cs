@@ -520,8 +520,22 @@ namespace NB.Core.Web.Utility
             return norm;
         }
 
-        public static bool IsNullable<T>(T t) { return false; }
-        public static bool IsNullable<T>(T? t) where T : struct { return true; }
+        public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+        {
+            //http://investexcel.net/free-intraday-stock-data-excel/
+            // Unix timestamp is seconds past epoch
+            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            return dtDateTime;
+        }
+
+        public static StreamReader GetStreamReader(string content)
+        {
+            var byteArray = Encoding.UTF8.GetBytes(content);
+            var stream = new MemoryStream(byteArray);
+            var reader = new StreamReader(stream);
+            return reader;
+        }
         //private MyHelper() { }
         //static MyHelper() { }
     }

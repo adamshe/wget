@@ -49,7 +49,16 @@ namespace NB.Core.Web.DownloadClient
             return obj;
         }
 
+        public async Task<T> DownloadObjectStreamTaskAsync(string url)
+        {
+            var sr = await DownloadStreamTaskAync(url);
+            var ticker = _setting.GetTickerFromUrl(url);
+            T obj = ConvertResult(sr, ticker);
+            return obj;
+        }
+
         protected abstract T ConvertResult(string contentStr, string ticker="");
+        protected abstract T ConvertResult(StreamReader streamReader, string ticker = "");
 
         public async Task<T> DownloadObjectTaskAsync(BaseSetting setting)
         {
@@ -64,6 +73,14 @@ namespace NB.Core.Web.DownloadClient
             var contentString = await response.Content.ReadAsStringAsync();
 
             return contentString;
+        }
+
+        public async Task<StreamReader> DownloadStreamTaskAync(string url)
+        {
+            var response = await _httpClient.Value.GetStreamAsync(url);
+            var reader = new StreamReader(response);
+            
+            return reader;
         }
 
         public async Task<FileInfo> DownloadFileTaskAsync()

@@ -60,8 +60,8 @@ namespace NB.Core.Web.Models
                             base.Name = value.ToString();
                             break;
                     }
-                }
-                mValues[(int)prp] = value;
+                 mValues[(int)prp] = string.IsNullOrWhiteSpace(value.ToString())?null:value;
+               }
             }
         }
 
