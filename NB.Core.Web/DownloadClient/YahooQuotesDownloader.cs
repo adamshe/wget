@@ -27,7 +27,7 @@ namespace NB.Core.Web.DownloadClient
             items = FinanceHelper.ImportExport.ToQuotesData(contentStr,
                                                               ',',
                                                               set.Properties,
-                                                              CultureInfo.GetCultureInfo("en-US"));
+                                                              MyHelper.DefaultCulture);
             
             return new YahooQuotesResult(items, set);
         }

@@ -74,6 +74,13 @@ namespace NB.Core.Web.DownloadClient
         }
 
         protected abstract T ConvertResult(string contentStr, string ticker="");
+
+        /// <summary>
+        /// This function is implemented only for CVSReader in stream. By Default, it should not implement
+        /// </summary>
+        /// <param name="streamReader"></param>
+        /// <param name="ticker"></param>
+        /// <returns></returns>
         protected abstract T ConvertResult(StreamReader streamReader, string ticker = "");
 
         public async Task<T> DownloadObjectTaskAsync(BaseSetting setting)

@@ -27,7 +27,6 @@ http://finance.yahoo.com/q/hp?s=
 		private DateTime _start;
 		private DateTime _end;
 
-		public const string YahooCsvStr = "http://ichart.finance.yahoo.com/table.csv?s={0}&a={1}&b={2}&c={3}&d={4}&e={5}&f={6}&g={7}&ignore=.csv";
 		public YahooHistoryCsvSetting (string ticker)
 		{
 			Ticker = ticker;
@@ -35,14 +34,9 @@ http://finance.yahoo.com/q/hp?s=
 			_end = DateTime.Now;
 		}
 
-		public IEnumerable<string> GetUrls(string symbols)
+		protected sealed override string UrlStr
 		{
-			var fixSymbols = MyHelper.FixString(symbols);
-			var tickers = fixSymbols.Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
-			foreach (var ticker in tickers)
-			{
-				yield return GetUrl(ticker);
-			}
+			get { return "http://ichart.finance.yahoo.com/table.csv?s={0}&a={1}&b={2}&c={3}&d={4}&e={5}&f={6}&g={7}&ignore=.csv"; ; }
 		}
 
 		[DataType(DataType.Date)]
@@ -64,7 +58,7 @@ http://finance.yahoo.com/q/hp?s=
 
 		public override string GetUrl(string ticker)
 		{
-			return string.Format(YahooCsvStr, ticker,
+			return string.Format(UrlStr, ticker,
 					Start.AddMonths(-1).Month, Start.Day, Start.Year,
 					End.AddMonths(-1).Month, End.Day, End.Year,
 					_intervel);

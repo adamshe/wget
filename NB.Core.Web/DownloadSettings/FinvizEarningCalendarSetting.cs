@@ -12,11 +12,14 @@ namespace NB.Core.Web.DownloadSettings
 {
 	public class FinvizEarningCalendarSetting: BaseSetting
 	{
-		public const string UrlStr = "https://query.yahooapis.com/v1/public/yql?q=select * from html where url=\'http://www.finviz.com/quote.ashx?t={0}\' and xpath=\'/html/body//table[@class=\"snapshot-table2\"]//tr[11]/td[6]\'";
-
 		public FinvizEarningCalendarSetting(string ticker="SPY")
 		{
 			Ticker = ticker;
+		}
+
+		protected sealed override string UrlStr
+		{
+			get { return "https://query.yahooapis.com/v1/public/yql?q=select * from html where url=\'http://www.finviz.com/quote.ashx?t={0}\' and xpath=\'/html/body//table[@class=\"snapshot-table2\"]//tr[11]/td[6]\'"; }
 		}
 
 		public IEnumerable<string> GetUrls(string symbols)

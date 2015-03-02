@@ -536,6 +536,22 @@ namespace NB.Core.Web.Utility
             var reader = new StreamReader(stream);
             return reader;
         }
+
+        public static DateTime DateTimeFromUnixTimestamp(int unixTimestamp, int intervalInSecond, int timeOffset)
+        {
+            DateTime unixYear0 = new DateTime(1970, 1, 1);
+            long unixTimeStampInTicks = unixTimestamp * TimeSpan.TicksPerSecond + TimeSpan.TicksPerSecond * intervalInSecond * timeOffset;
+            DateTime dtUnix = new DateTime(unixYear0.Ticks + unixTimeStampInTicks);
+          
+            return dtUnix;
+        }
+
+        public static long UnixTimestampFromDateTime(DateTime date)
+        {
+            long unixTimestamp = date.Ticks - new DateTime(1970, 1, 1).Ticks;
+            unixTimestamp /= TimeSpan.TicksPerSecond;
+            return unixTimestamp;
+        }
         //private MyHelper() { }
         //static MyHelper() { }
     }

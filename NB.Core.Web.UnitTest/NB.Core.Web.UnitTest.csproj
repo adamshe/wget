@@ -64,6 +64,10 @@
       <Project>{0c524540-0b5b-40f9-a094-9061c7ebc8a2}</Project>
       <Name>NB.Core.Web</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NB.Core\NB.Core.csproj">
+      <Project>{c4cc8dcc-4a6a-4dcb-b309-b2ad95337728}</Project>
+      <Name>NB.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="CSV\" />

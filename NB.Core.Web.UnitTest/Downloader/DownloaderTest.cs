@@ -10,6 +10,10 @@ using NB.Core.Web.Enums;
 using NB.Core.Web.Utility;
 using System.Linq;
 using NB.Core.Web.Extensions;
+using System.Collections.Concurrent;
+using NB.Core.Web.Models;
+using NB.Core.Valuation;
+
 namespace NB.Core.Web.UnitTest
 {
     [TestClass]
@@ -41,13 +45,32 @@ namespace NB.Core.Web.UnitTest
             Debug.Write(task);
             var setting = new YahooHistoryCsvSetting("QQQ");
             setting.Start = new DateTime(2014,5,1);
-            setting.End = new DateTime(2014, 12, 31);
+            setting.End = new DateTime(2014,12, 31);
             var downloader = new YahooHistoryCsvDownloader(setting);
             var url = setting.GetUrl();
             Debug.WriteLine(url);
             var data = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
             var datas = await downloader.BatchDownloadObjectsStreamTaskAsync(setting.GetUrls("AAPL,YHOO,MSFT,GOOGL")).ConfigureAwait(false);
 //BatchDownloadObjectsStreamTaskAsync //BatchDownloadObjectsTaskAsync
+            Debug.WriteLine(data.ToString());
+            foreach (var data1 in datas)
+                Debug.WriteLine(data1.ToString());
+
+        }
+
+        [TestMethod]
+        public async Task GoogleIntradyCsvDownloaderTest()
+        {
+            DateTime now = MyHelper.DateTimeFromUnixTimestamp(1425047460, 60, -300);
+            Debug.WriteLine(now.ToString("MM-dd-yyyy hh:mm:ss"));
+
+            var setting = new GoogleIntradayCsvSetting("CSCO");
+            var downloader = new GoogleIntradayCsvDownloader(setting);
+            var url = setting.GetUrl();
+            Debug.WriteLine(url);
+            var data = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
+            var datas = await downloader.BatchDownloadObjectsStreamTaskAsync(setting.GetUrls("AAPL,YHOO,MSFT,GOOGL")).ConfigureAwait(false);
+            //BatchDownloadObjectsStreamTaskAsync //BatchDownloadObjectsTaskAsync //Stream
             Debug.WriteLine(data.ToString());
             foreach (var data1 in datas)
                 Debug.WriteLine(data1.ToString());
@@ -68,9 +91,10 @@ namespace NB.Core.Web.UnitTest
 
             Debug.WriteLine(file.ToString());
             foreach (var filestr in files)
-                Debug.WriteLine(filestr.ToString());
-          
+                Debug.WriteLine(filestr.ToString());          
         }
+
+      
 
         [TestMethod]
         public async Task FinvizEarningCalendarDownloaderTest()
@@ -191,6 +215,56 @@ namespace NB.Core.Web.UnitTest
             {
                 Debug.WriteLine("Name: {0}             -      Value: {1}", pair.Name.PadRight(26), pair.Value.ToString().PadLeft(6));
             }
+        }
+
+        [TestMethod]
+        public async Task CalculateFairValue()
+        {
+            double inflation = 0.02; //todo: get from yahoo quote
+            double fixincomeReturnRate = 0.0795; //todo: get from yahoo quote
+            var setting = new CompanyStatisticsDownloadSetting("CSCO");
+            var dl = new YahooCompanyStatisticsDownload(setting);
+            var bag = new ConcurrentBag<CompanyStatisticsData>();
+            var results = await dl.BatchDownloadObjectsTaskAsync(setting.GetUrls(tickers)).ConfigureAwait(false);
+
+            //Parallel.ForEach(tickers, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount },
+            //    id =>
+            //    {
+            //        var resp = dl.BatchDownloadObjectsTaskAsync(id);
+            //        if (resp.Result.Connection.State == ConnectionState.Success)
+            //        {
+
+            //            var item = resp.Result.Result.Item;
+            //            bag.Add(item);
+            //        }
+            //    });
+            results.OrderBy(result => { return result.Item.TradingInfo.TwoHundredDayMovingAverage; });
+            //TODO: Add property FairValue and Market Price in CompanyStatisticsData
+            foreach (var result in results)
+            {
+                var ti = result.Item.TradingInfo;
+                var vm = result.Item.ValuationMeasures;
+                var highlight = result.Item.FinancialHighlights;
+                var eps = highlight.DilutedEPS;
+
+                // var growthRate1 = vm.TrailingPE / vm.ForwardPE;
+                var growthRate = highlight.QuarterlyRevenueGrowthPercent;//.QuaterlyEarningsGrowthPercent /100.0;
+                //var outStandingShare = vm.MarketCapitalisationInMillion / highlight.RevenuePerShare.
+
+                var fairValue = FairValueEngine.DiscountedCurrentValue(eps, 3, growthRate / 100.0, inflation, fixincomeReturnRate);
+                if (eps <= 0 && fairValue <= 0)
+                    fairValue = FairValueEngine.FutureValue(highlight.RevenuePerShare, growthRate / 100.0, 1) * 1.5;
+                Debug.WriteLine("{0}      FairValue : {1}      forward P/E : {2}       EV/Rev : {3}       Margin: {4}          ShortPercentage : {5}       EPS: {6}      GrowthRate: {7}",
+                    result.Item.ID.PadRight(5),
+                    fairValue.ToString("C").PadLeft(9),
+                    vm.ForwardPE.ToString().PadLeft(8),
+                    vm.EnterpriseValueToRevenue.ToString().PadLeft(8),
+                    (highlight.ProfitMarginPercent / 100.0).ToString("P").PadLeft(9),
+                    (ti.ShortPercentOfFloat / 100.0).ToString("P").PadLeft(8),
+                    eps.ToString("C").PadLeft(8),
+                    (growthRate / 100.0).ToString("P").PadLeft(8));
+            }
+
         }
 
       //  [TestMethod]

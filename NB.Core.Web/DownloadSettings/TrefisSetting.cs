@@ -12,13 +12,19 @@ namespace NB.Core.Web.DownloadSettings
     {
         public override string GetUrl()
         {
-            return "http://www.trefis.com/companies";
+            return UrlStr;
         }
 
         public override string GetUrl(string ticker)
         {
             return GetUrl();
         }
+
+        protected sealed override string UrlStr
+        {
+            get { return "http://www.trefis.com/companies"; }
+        }
+
 
         public override string GetTickerFromUrl(string url)
         {

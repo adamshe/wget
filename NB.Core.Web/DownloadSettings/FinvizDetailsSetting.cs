@@ -12,7 +12,6 @@ namespace NB.Core.Web.DownloadSettings
 {
 	public class FinvizDetailsSetting: BaseSetting
 	{
-		public const string UrlStr = @"http://www.finviz.com/quote.ashx?t={0}";
 			/*"https:/table/query.yahooapis.com/v1/public/yql?q=select * from html where url=\'http:/table/www.finviz.com/quote.ashx?t={0}\' and xpath=\'/html/body/table/table[@class=\"snapshot-table2\"]/tr\'";*/
 
 		public FinvizDetailsSetting(string ticker = "SPY")
@@ -20,13 +19,9 @@ namespace NB.Core.Web.DownloadSettings
 			Ticker = ticker;
 		}
 
-		public IEnumerable<string> GetUrls(string symbols)
+		protected sealed override string UrlStr
 		{
-			var tickers = MyHelper.GetStringToken(symbols, new string[] { ";", "," });
-			foreach (var ticker in tickers)
-			{
-				yield return string.Format(UrlStr, ticker);
-			}
+			get { return "http://www.finviz.com/quote.ashx?t={0}"; }
 		}
 
 		public override string GetFileName(string ticker)

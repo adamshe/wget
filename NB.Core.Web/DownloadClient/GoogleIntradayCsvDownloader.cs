@@ -22,16 +22,19 @@ namespace NB.Core.Web.DownloadClient
             
         }
 
-        protected override IEnumerable<PriceData> ConvertResult(StreamReader sr, string ticker = "")
+
+        protected override IEnumerable<PriceData> ConvertResult(StreamReader reader, string ticker = "")
         {
             var list = new List<PriceData>(200);
-            sr.ReadLine();
-            sr.ReadLine();
-            sr.ReadLine();
-            sr.ReadLine();
-            sr.ReadLine();
-            sr.ReadLine();
-            sr.ReadLine();
+            string headerLine;
+            headerLine = reader.ReadLine();
+            headerLine = reader.ReadLine();
+            headerLine = reader.ReadLine();
+            headerLine = reader.ReadLine();
+            ((GoogleIntradayCsvSetting)Setting).TimezoneOffset = int.Parse(MyHelper.ExtractPattern(headerLine, @".*=(\d*)"));
+            headerLine = reader.ReadLine();
+            headerLine = reader.ReadLine();
+            headerLine = reader.ReadLine();
             
             /*
                 * EXCHANGE%3DNYSE
@@ -43,8 +46,9 @@ namespace NB.Core.Web.DownloadClient
                 TIMEZONE_OFFSET=-300
                 */
                
-            using (var csvReader = new CsvReader(sr))
+            using (var csvReader = new CsvReader(reader))
             {
+                csvReader.Configuration.HasHeaderRecord = false;
                 csvReader.Configuration.RegisterClassMap<PriceDataGoogleMapping>();
                 while (csvReader.Read())
                 {
@@ -71,15 +75,18 @@ namespace NB.Core.Web.DownloadClient
                     DATA=
                     TIMEZONE_OFFSET=-300
                  */
-                reader.ReadLine();
-                reader.ReadLine();
-                reader.ReadLine();
-                reader.ReadLine();
-                reader.ReadLine();
-                reader.ReadLine();
-                reader.ReadLine();
+                string headerLine;
+                headerLine = reader.ReadLine();
+                headerLine = reader.ReadLine();
+                headerLine = reader.ReadLine();
+                headerLine = reader.ReadLine();
+                ((GoogleIntradayCsvSetting)Setting).TimezoneOffset = int.Parse(MyHelper.ExtractPattern(headerLine, @".*=(\d*)"));
+                headerLine = reader.ReadLine();
+                headerLine = reader.ReadLine();
+                headerLine = reader.ReadLine();
                 using (var csvReader = new CsvReader(reader))
                 {
+                    csvReader.Configuration.HasHeaderRecord = false;
                     csvReader.Configuration.RegisterClassMap<PriceDataGoogleMapping>();
                     while (csvReader.Read())
                     {

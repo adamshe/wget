@@ -28,19 +28,28 @@ namespace NB.Core.Web.DownloadSettings
 {
 	public class GoogleIntradayCsvSetting: BaseSetting
 	{
-		public const string UrlStr = @"http://www.google.com/finance/getprices?q={0}&i={1}&p=1000d&f=d,c,o,h,l";
 
 		public GoogleIntradayCsvSetting(string ticker = "SPY")
 		{
 			Ticker = ticker;
+			PeriodInSeconds = 180;
+            TimezoneOffset = -300;
 		}
 
-		public IEnumerable<string> GetUrls(string symbols)
+		public int PeriodInSeconds { get; set; }
+        public int TimezoneOffset { get; set; }
+        
+		protected sealed override string UrlStr
+		{
+			get { return "http://www.google.com/finance/getprices?q={0}&i={1}&p=1000d&df=cpct&f=d,o,h,l,c,v"; }
+		}
+
+		public sealed override IEnumerable<string> GetUrls(string symbols)
 		{
 			var tickers = MyHelper.GetStringToken(symbols, new string[] { ";", "," });
 			foreach (var ticker in tickers)
 			{
-				yield return string.Format(UrlStr, ticker);
+				yield return GetUrl(ticker);
 			}
 		}
 
@@ -62,12 +71,12 @@ namespace NB.Core.Web.DownloadSettings
 
 		public override string GetUrl()
 		{
-			return string.Format(UrlStr, Ticker);
+			return GetUrl (this.Ticker);
 		}
 
 		public override string GetUrl(string ticker)
 		{
-			return string.Format(UrlStr, ticker);
+			return string.Format(UrlStr, ticker, PeriodInSeconds);
 		}
 	}
 }

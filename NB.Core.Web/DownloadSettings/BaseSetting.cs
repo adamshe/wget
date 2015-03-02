@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NB.Core.Web.Utility;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -9,6 +10,17 @@ namespace NB.Core.Web.DownloadSettings
     {
         public abstract string GetUrl();
         public abstract string GetUrl(string ticker);
+
+        public virtual IEnumerable<string> GetUrls(string symbols)
+        {
+            var tickers = MyHelper.GetStringToken(symbols, new string[] { ";", "," });
+            foreach (var ticker in tickers)
+            {
+                yield return string.Format(UrlStr, ticker);
+            }
+        }
+
+        protected abstract string UrlStr { get; }
 
         public abstract string GetTickerFromUrl(string url);
         public virtual string GetFileName(string ticker) {return string.Format("{0}-{1}.txt",ticker, DateTime.Now.ToString("yyyyMMdd"));}

@@ -13,7 +13,6 @@ namespace NB.Core.Web.DownloadSettings
 {
     public class YahooQuotesDownloadSettings : BaseSetting
     {
-        public const string UrlStr = "http://download.finance.yahoo.com/d/quotes.csv?s=";
         private QuoteProperty[] _quoteProperties;
         private string[] ids;
 
@@ -69,6 +68,12 @@ namespace NB.Core.Web.DownloadSettings
                     _quoteProperties = value;
             }
         }
+
+        protected sealed override string UrlStr
+        {
+            get { return "http://download.finance.yahoo.com/d/quotes.csv?s="; }
+        }
+
 
         public override string GetUrl()
         {
