@@ -508,7 +508,7 @@ namespace NB.Core.Web.Utility
 
         public static string NumerizeString (string str)
         {
-            var norm = str.Trim();
+            var norm = str.Trim().Replace(",",string.Empty);
             if (norm.EndsWith("%"))
             {
                 double num = double.Parse(norm.Replace("%", "")) / 100.0;

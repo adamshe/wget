@@ -10,9 +10,18 @@ namespace NB.Core.Web.Models.Metadata
     public class XPathAttribute : Attribute
     {
         string _path;
-        public XPathAttribute(string path)
+        string _name;
+
+        public XPathAttribute(string path, string name="")
         {
             _path = path;
+            _name = name;
+        }
+
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
         }
 
         public string Path

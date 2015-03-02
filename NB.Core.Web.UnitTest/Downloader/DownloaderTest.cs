@@ -152,10 +152,11 @@ namespace NB.Core.Web.UnitTest
         [TestMethod]
         public async Task FinvizDetailsBatchDownloaderTest()
         {
-            var setting = new FinvizDetailsSetting("AAPL");
+            var setting = new FinvizDetailsSetting("CSCO");
             var downloader = new FinvizDetailsDownloader(setting);
-            var results = await downloader.BatchDownloadObjectsTaskAsync(setting.GetUrls(tickers)).ConfigureAwait(false);
-            foreach (var result in results)
+           var result = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
+            // var results = await downloader.BatchDownloadObjectsTaskAsync(setting.GetUrls(tickers)).ConfigureAwait(false);
+          //  foreach (var result in results)
             {
                 var stringPropertyNamesAndValues = result.GetType()
                     .GetProperties()

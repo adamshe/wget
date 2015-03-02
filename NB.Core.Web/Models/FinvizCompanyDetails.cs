@@ -1,6 +1,7 @@
 ﻿using NB.Core.Web.Models.Metadata;
 using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Web;
 
@@ -12,6 +13,7 @@ namespace NB.Core.Web.Models
         string _indexName;
         #region FA
 
+        public string Ticker { get; set; }
        ///table//html/body/table[3]/tbody/tr[1]/td/table/tbody/tr[6]/td/table/tbody/tr[1]/td[1]
         [XPath(@"/table/tr[1]/td[2]/b")]
         public string IndexName { 
@@ -125,6 +127,22 @@ namespace NB.Core.Web.Models
         [XPath(@"/table/tr[10]/td[8]/b")]
         public float ProfitMarginTTM { get; set; }
 
+        [XPath(@"/table/tr[11]/td[8]/b")]
+        public float Payout { get; set; }
+
+        [XPath(@"/table/tr[1]/td[10]/b")]
+        public string SharesOutstanding { get; set; }
+
+        [XPath(@"/table/tr[2]/td[10]/b")]
+        public string SharesFloat { get; set; }
+
+        [XPath(@"/table/tr[3]/td[10]/b")]
+        public float ShortFloatPercent { get; set; }
+
+        [XPath(@"/table/tr[4]/td[10]/b")]
+        public float ShortRatio { get; set; }
+
+ 
         #endregion
 
         #region Growth Factor
@@ -160,10 +178,6 @@ namespace NB.Core.Web.Models
         public float QuarterlyEarningGrowthYearOverYear { get; set; }
 
 
-
-
-
-
         #endregion
 
         #region TA
@@ -177,6 +191,75 @@ namespace NB.Core.Web.Models
         [XPath(@"/table/tr[12]/td[8]/b")]
         public float SMA200RelativeTo { get; set; }
 
+
+        [XPath(@"/table/tr[5]/td[10]/b")]
+        public float TargetPrice { get; set; }
+
+        [XPath(@"/table/tr[6]/td[10]/b")]
+        public string Range52Week { get; set; }
+
+        [XPath(@"/table/tr[7]/td[10]/b")]
+        public float OffFromHigh52Week { get; set; }
+
+        [XPath(@"/table/tr[8]/td[10]/b")]
+        public float OffFromLOw52Week { get; set; }
+
+        [XPath(@"/table/tr[9]/td[10]/b")]
+        public float RSI { get; set; }
+
+        [XPath(@"/table/tr[10]/td[10]/b")]
+        public float RelativeVolume { get; set; }
+
+        [XPath(@"/table/tr[11]/td[10]/b")]
+        public string AverageVolume { get; set; }
+
+        [XPath(@"/table/tr[12]/td[10]/b")]
+        [Description("Current Volume / 3-month Average Volume")]
+        public long Volume { get; set; }
+
+        [XPath(@"/table/tr[1]/td[12]/b")]
+        public float WeekPerformance { get; set; }
+
+        [XPath(@"/table/tr[2]/td[12]/b")]
+        public float MonthPerformance { get; set; }
+
+        [XPath(@"/table/tr[3]/td[12]/b")]
+        public float QuarterPerformance { get; set; }
+
+        [XPath(@"/table/tr[4]/td[12]/b")]
+        public float HalfYearPerformance { get; set; }
+
+        [XPath(@"/table/tr[5]/td[12]/b")]
+        public float YearPerformance { get; set; }
+
+        [XPath(@"/table/tr[6]/td[12]/b")]
+        public float YearToDatePerformance { get; set; }
+
+        [XPath(@"/table/tr[7]/td[12]/b")]
+        [Description("Volatility relative to stock market")]
+        public float Beta { get; set; }
+
+        [XPath(@"/table/tr[8]/td[12]/b")]
+        [Description("{14 days true range} = max[({high} - {low}), abs({high} - {closeprev}), abs(low-closeprev)]")]
+        public float AverageTrueRange { get; set; }
+
+        [XPath(@"/table/tr[9]/td[12]/b", "Volatility")]
+        [RegularExpression(@"(.*%)\s.*%$")]
+        public string WeeklyVolatility { get; set; }
+
+        [XPath(@"/table/tr[9]/td[12]/b", "Volatility")]
+        [RegularExpression(@".*%\s(.*%)$")]
+        public string MonthlyVolatility { get; set; }
+
+        [XPath(@"/table/tr[10]/td[12]/b")]
+        public float PreviousClose { get; set; }
+
+        [XPath(@"/table/tr[11]/td[12]/b")]
+        public float CurrentPrice { get; set; }
+
+        [XPath(@"/table/tr[12]/td[12]/b")]
+        [Description("Change from previous close")]
+        public float ChangePercent { get; set; }
         #endregion
 
     }

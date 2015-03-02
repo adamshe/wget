@@ -6,6 +6,7 @@ using NB.Core.Web.Xml;
 using NB.Core.Web.DownloadSettings;
 using System.IO;
 using NB.Core.Web.Models.Metadata;
+using System.ComponentModel.DataAnnotations;
 
 namespace NB.Core.Web.DownloadClient
 {
@@ -41,21 +42,35 @@ namespace NB.Core.Web.DownloadClient
             object value = null;
             dynamic normalizeStr;
             XPathAttribute xpath;
-            var details = new FinvizCompanyDetails();
+            RegularExpressionAttribute regex;
+            var details = new FinvizCompanyDetails { Ticker = Setting.Ticker};
             foreach (var property in details.GetType().GetProperties())
             {
-                xpath = property.GetCustomAttributes(typeof(XPathAttribute), false).FirstOrDefault() as XPathAttribute;                
+                xpath = property.GetCustomAttributes(typeof(XPathAttribute), false).FirstOrDefault() as XPathAttribute;
+
+                if (xpath == null)
+                    continue;
+
+                
+
                 resultNode = XPath.GetElement(xpath.Path, doc);
 
                 var type = Nullable.GetUnderlyingType(property.PropertyType);
-                
-                normalizeStr = MyHelper.NumerizeString(resultNode.Value);
-                
-                if (property.PropertyType == typeof(DateTime))
-                    normalizeStr = MyHelper.ConvertEarningDate(normalizeStr);
+
+                normalizeStr = resultNode.Value;
+
+                regex = property.GetCustomAttributes(typeof(RegularExpressionAttribute), false).FirstOrDefault() as RegularExpressionAttribute;
 
                 try
                 {
+                    if (regex != null)
+                        normalizeStr =MyHelper.NumerizeString( MyHelper.ExtractPattern(normalizeStr, regex.Pattern));
+                    else if (property.PropertyType == typeof(DateTime))
+                        normalizeStr = MyHelper.ConvertEarningDate(normalizeStr);
+                    else if (property.PropertyType != typeof(string))
+                        normalizeStr = MyHelper.NumerizeString(resultNode.Value);
+
+                
                     if (type != null)
                         value = Convert.ChangeType(normalizeStr, type, MyHelper.DefaultCulture.NumberFormat);
                     else
