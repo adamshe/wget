@@ -51,10 +51,12 @@
     <Compile Include="DownloadClient\GoogleIntradayCsvDownloader.cs" />
     <Compile Include="DownloadClient\FinvizDetailsDownloader.cs" />
     <Compile Include="DownloadClient\FinvizEarningCalendarDownloader.cs" />
+    <Compile Include="DownloadClient\NasdaqEarningForecastDownloadClient.cs" />
     <Compile Include="DownloadClient\YahooCompanyStatisticsDownload.cs" />
     <Compile Include="DownloadSettings\CompanyStatisticsDownloadSetting.cs" />
     <Compile Include="DownloadSettings\GoogleIntradayCsvSetting.cs" />
     <Compile Include="DownloadSettings\FinvizDetailsSetting.cs" />
+    <Compile Include="DownloadSettings\NasdaqEarningForecastDownloadSetting.cs" />
     <Compile Include="Enums\CarrierGateWay.cs" />
     <Compile Include="Extensions\DateTimeExtension.cs" />
     <Compile Include="Models\CompanyFinancialHighlights.cs" />
@@ -65,6 +67,7 @@
     <Compile Include="Models\FinvizCompanyDetails.cs" />
     <Compile Include="Models\Mapping\PriceDataGoogleMapping.cs" />
     <Compile Include="Models\Mapping\PriceDataYahooMapping.cs" />
+    <Compile Include="Models\NasdaqEarningForecastResult.cs" />
     <Compile Include="Models\PriceData.cs" />
     <Compile Include="Models\SharesSplitFactor.cs" />
     <Compile Include="Models\TrefisCompanyCoveredInfo.cs" />

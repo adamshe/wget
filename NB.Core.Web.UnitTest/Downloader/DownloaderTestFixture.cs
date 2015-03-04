@@ -13,6 +13,10 @@ using NB.Core.Web.Extensions;
 using System.Collections.Concurrent;
 using NB.Core.Web.Models;
 using NB.Core.Valuation;
+using System.Globalization;
+using System.Reflection;
+using System.Text;
+using System.Web.Script.Serialization;
 
 namespace NB.Core.Web.UnitTest
 {
@@ -293,7 +297,75 @@ namespace NB.Core.Web.UnitTest
                     , phone, CarrierGateWay.ATT);
             }
         }
+        
+        [TestMethod]
+        public void GetCalendars()
+        {
+            Calendar[] myOptCals = new CultureInfo("en-US").OptionalCalendars;
+            var Calendar = new GregorianCalendar(GregorianCalendarTypes.USEnglish);
+            // Checks which ones are GregorianCalendar then determines the GregorianCalendar version.
+            Debug.WriteLine("The en-US culture supports the following calendars:");
+            foreach (Calendar cal in myOptCals)
+            {
+                if (cal.GetType() == typeof(GregorianCalendar))
+                {
+                    GregorianCalendar myGreCal = (GregorianCalendar)cal;
+                    GregorianCalendarTypes calType = myGreCal.CalendarType;
+                    Debug.WriteLine("   {0} ({1})", cal, calType);
+                }
+                else
+                {
+                    Debug.WriteLine("   {0} {1}", cal, cal.AlgorithmType);
+                }
+            }
+        }
 
+        [TestMethod]
+        public async Task GetNasdaqEarningForcast()
+        {
+            var setting = new NasdaqEarningForecastDownloadSetting("JD");
+            var downloader = new NasdaqEarningForecastDownloadClient(setting);
+            var result = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
+            //foreach (var q in result.QuarterlyEarningForecasts)
+            //{
+            //    Console.WriteLine(q..ConsensusEpsForecast)
+            //}
+            var serializer = new JavaScriptSerializer();
+            String json = serializer.Serialize(result);
+            Debug.WriteLine(json);
+            foreach (var q in result.YearlyEarningForecasts)
+            {
+                PrintProperties(q, 0);
+            }
+
+            foreach (var q in result.QuarterlyEarningForecasts)
+            {
+                PrintProperties(q, 0);
+            }
+        }
+
+        public void PrintProperties(object obj, int indent)
+        {
+            if (obj == null) return;
+            string indentString = new string(' ', indent);
+            Type objType = obj.GetType();
+            PropertyInfo[] properties = objType.GetProperties(
+                                    BindingFlags.Public | 
+                                    BindingFlags.Instance);
+            foreach (PropertyInfo property in properties)
+            {
+                object propValue = property.GetValue(obj, null);
+                if (property.PropertyType.Assembly == objType.Assembly)
+                {
+                    Console.WriteLine("{0}{1}:", indentString, property.Name);
+                    PrintProperties(propValue, indent + 2);
+                }
+                else
+                {
+                    Console.WriteLine("{0}{1}: {2}", indentString, property.Name, propValue);
+                }
+            }
+        }
         protected IEnumerable<Task> GetScheduledTasks()
         {
             yield break;

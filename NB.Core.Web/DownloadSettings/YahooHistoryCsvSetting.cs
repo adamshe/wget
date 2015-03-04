@@ -39,6 +39,15 @@ http://finance.yahoo.com/q/hp?s=
 			get { return "http://ichart.finance.yahoo.com/table.csv?s={0}&a={1}&b={2}&c={3}&d={4}&e={5}&f={6}&g={7}&ignore=.csv"; ; }
 		}
 
+		public sealed override IEnumerable<string> GetUrls(string symbols)
+		{
+			var tickers = MyHelper.GetStringToken(symbols, new string[] { ";", "," });
+			foreach (var ticker in tickers)
+			{
+				yield return GetUrl(ticker);
+			}            
+		}
+
 		[DataType(DataType.Date)]
 		public DateTime Start { get { return _start; } set { _start = value; } }
 
