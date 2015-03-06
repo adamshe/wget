@@ -102,8 +102,7 @@ namespace NB.Core.Web.DownloadSettings
 
         public override string GetTickerFromUrl(string url)
         {
-            var match = Regex.Match(url, @".*quotes.csv\?s=(?<ticker>\w*)&f=.*");
-            var ticker = match.Groups["ticker"].Value;
+            var ticker = MyHelper.ExtractPattern(url, @".*quotes.csv\?s=(?<ticker>\w*)&f=.*");
             return ticker;
         }
 

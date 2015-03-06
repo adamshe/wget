@@ -11,11 +11,13 @@ namespace NB.Core.Web.Models.Metadata
     {
         string _path;
         string _name;
+        string _source;
 
-        public XPathAttribute(string path, string name="")
+        public XPathAttribute(string path, string name="", string source="")
         {
             _path = path;
             _name = name;
+            _source = source;
         }
 
         public string Name
@@ -28,6 +30,12 @@ namespace NB.Core.Web.Models.Metadata
         {
             get { return _path; }
             set { _path = value; }
+        }
+
+        public string Source
+        {
+            get { return _source; }
+            set { _source = value; }
         }
 
     }

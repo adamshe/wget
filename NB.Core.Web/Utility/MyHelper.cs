@@ -41,6 +41,8 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Linq;
 using System.Threading;
+using System.Xml.Serialization;
+using System.Xml.Linq;
 namespace NB.Core.Web.Utility
 {
     public static class MyHelper
@@ -57,10 +59,10 @@ namespace NB.Core.Web.Utility
                 if (enc == null)
                     enc = Encoding.UTF8;
 
-                if (stream.CanSeek) stream.Seek(0, System.IO.SeekOrigin.Begin);
+                if (stream.CanSeek) stream.Seek(0, SeekOrigin.Begin);
                 if (stream.CanRead)
                 {
-                    using (System.IO.StreamReader sr = new System.IO.StreamReader(stream, enc))
+                    using (StreamReader sr = new StreamReader(stream, enc))
                     {
                         res = sr.ReadToEnd();
                     }
@@ -239,6 +241,16 @@ namespace NB.Core.Web.Utility
             }
         }
 
+        public static XParseElement GetResultTable (string content, string matchPattern, string targetXpath)
+        {
+            var match = Regex.Matches(content, matchPattern, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);
+
+            var targetTableStr = match[0].Groups[0].Value;
+            XParseDocument doc = MyHelper.ParseXmlDocument(targetTableStr);
+
+            var resultNode = XPath.GetElement(targetXpath, doc);
+            return resultNode;
+        }
         public static XParseDocument ParseXmlDocument(string text) { return XmlParser.Parse(text); }
 
         public static XParseDocument ParseXmlDocument(System.IO.Stream xml)
@@ -552,6 +564,31 @@ namespace NB.Core.Web.Utility
             unixTimestamp /= TimeSpan.TicksPerSecond;
             return unixTimestamp;
         }
+
+       
+            public static T Deserialize<T>(XDocument doc)
+            {
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+
+                using (var reader = doc.Root.CreateReader())
+                {
+                    return (T)xmlSerializer.Deserialize(reader);
+                }
+            }
+
+            public static XDocument Serialize<T>(T value)
+            {
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+
+                XDocument doc = new XDocument();
+                using (var writer = doc.CreateWriter())
+                {
+                    xmlSerializer.Serialize(writer, value);
+                }
+
+                return doc;
+            }
+       
         //private MyHelper() { }
         //static MyHelper() { }
     }

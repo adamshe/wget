@@ -22,15 +22,6 @@ namespace NB.Core.Web.DownloadSettings
 			get { return "https://query.yahooapis.com/v1/public/yql?q=select * from html where url=\'http://www.finviz.com/quote.ashx?t={0}\' and xpath=\'/html/body//table[@class=\"snapshot-table2\"]//tr[11]/td[6]\'"; }
 		}
 
-		public IEnumerable<string> GetUrls(string symbols)
-		{
-			var tickers = MyHelper.GetStringToken(symbols, new string[] { ";", "," });
-			foreach (var ticker in tickers)
-			{
-				yield return string.Format(UrlStr, ticker);
-			}
-		}
-
 		public override string GetFileName(string ticker)
 		{
 			return string.Format(@"{0}\{1}-{2}.txt", Directory.GetCurrentDirectory(), ticker, DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture));
@@ -43,9 +34,7 @@ namespace NB.Core.Web.DownloadSettings
 
 		public override string GetTickerFromUrl(string url)
 		{
-			//quote.ashx?t={0}
-			var match = Regex.Match(url, @".*quote.ashx\?t=(?<ticker>\w*)\'\s.*");
-			var ticker = match.Groups["ticker"].Value;
+			var ticker = MyHelper.ExtractPattern(url, @".*quote.ashx\?t=(?<ticker>\w*)\'\s.*");
 			return ticker;
 		}
 

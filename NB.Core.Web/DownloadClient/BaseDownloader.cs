@@ -29,7 +29,7 @@ namespace NB.Core.Web.DownloadClient
         string _fileName = string.Empty;
         BaseSetting _setting;
 
-        public BaseDownloader(BaseSetting setting)
+        protected BaseDownloader(BaseSetting setting)
         {
             _setting = setting;
         }
@@ -81,7 +81,18 @@ namespace NB.Core.Web.DownloadClient
         /// <param name="streamReader"></param>
         /// <param name="ticker"></param>
         /// <returns></returns>
-        protected abstract T ConvertResult(StreamReader streamReader, string ticker = "");
+      //  protected abstract T ConvertResult(StreamReader streamReader, string ticker = "");
+
+        protected virtual T ConvertResult(StreamReader streamReader, string ticker = "")
+        {
+            var stream = streamReader.BaseStream;
+            if (stream != null)
+            {
+                var content = MyHelper.StreamToString(stream, System.Text.Encoding.UTF8);
+                return ConvertResult(content, ticker);
+            }
+            return default(T);
+        }
 
         public async Task<T> DownloadObjectTaskAsync(BaseSetting setting)
         {

@@ -75,8 +75,7 @@ http://finance.yahoo.com/q/hp?s=
 
 		public override string GetTickerFromUrl(string url)
 		{
-			var match = Regex.Match(url, @".*\?s=(?<ticker>\^?\w*)&.*");
-			var ticker = match.Groups["ticker"].Value;
+			var ticker = MyHelper.ExtractPattern(url, @".*\?s=(?<ticker>\^?\w*)&.*");
 			return ticker;
 		}
 

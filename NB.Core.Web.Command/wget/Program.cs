@@ -1,5 +1,6 @@
 ﻿using NB.Core.Web.DownloadClient;
 using NB.Core.Web.DownloadSettings;
+using NB.Core.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -15,22 +16,50 @@ namespace wget
     {
         static void Main(string[] args)
         {
+            TestConfiguration();
+        }
+
+        static void Download(string[] args)
+        {
             var watch = new Stopwatch();
             watch.Start();
-             var list = args.Length>1 ? args[1] : ConfigurationManager.AppSettings["tickers"];
+            var list = args.Length > 1 ? args[1] : ConfigurationManager.AppSettings["tickers"];
             if (string.Compare(args[0], "e", true) == 0)
             {
                 DownloadEarning(list).Wait();
             }
             else if (string.Compare(args[0], "f", true) == 0)
             {
-                DownloadHistoryCsv (list).Wait();
+                DownloadHistoryCsv(list).Wait();
             }
             watch.Stop();
             Console.WriteLine(string.Format("{0} seconds", watch.ElapsedMilliseconds / 1000.0));
-
         }
 
+        static void TestConfiguration()
+        {
+            //ExeConfigurationFileMap fileMap = new ExeConfigurationFileMap();
+            //fileMap.ExeConfigFilename = @"SpyData.config";  // relative path names possible
+            //// Open another config file
+            //Configuration config = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
+            //var data = new DataSectionManager();
+            //data.Name = "SPY";//.Date = new DateTime(2015, 3, 15);
+            //data.MetricsType = "S&P PE";
+            
+            //// read/write from it as usual
+            //ConfigurationSection mySection = config.GetSection("SpyDataSource");            
+            //config.SectionGroups.Clear(); // make changes to it
+            
+            //config.Save(ConfigurationSaveMode.Full, );  // Save changes
+
+            DatapointCollection settingsCollection = new DatapointCollection();
+            settingsCollection[0] = new DataElement { Date = new DateTime(2015, 3, 5), Value = 19.85f };
+            settingsCollection[1] = new DataElement { Date = new DateTime(2014, 1, 1), Value = 18.3f };
+            settingsCollection[2] = new DataElement { Date = new DateTime(2013, 1, 1), Value = 16f };
+            var config = new DataSectionManager("DataSource");
+            config.CreateDefaultConfigurationSection("DataSource", settingsCollection);
+
+        }
         static async Task DownloadHistoryCsv (string tickers)
         {
             var setting = new YahooHistoryCsvSetting("SPY");

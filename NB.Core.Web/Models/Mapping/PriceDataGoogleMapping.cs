@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NB.Core.Web.Models.Mapping
 {
-    public class PriceDataGoogleMapping : CsvClassMap<PriceData>
+    public class PriceDataGoogleMapping : CsvClassMap<PriceDataPoint>
     {
         public PriceDataGoogleMapping()
         {

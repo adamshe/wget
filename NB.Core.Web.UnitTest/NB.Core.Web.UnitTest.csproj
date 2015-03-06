@@ -61,6 +61,10 @@
       <Project>{987afd5b-3a0f-484b-805a-687db80323aa}</Project>
       <Name>NB.Core.Toolkit</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NB.Core.Web.DataAccess\NB.Core.Web.DataAccess.csproj">
+      <Project>{72abd4cd-f67b-40c2-b31b-d428e85660fa}</Project>
+      <Name>NB.Core.Web.DataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NB.Core.Web\NB.Core.Web.csproj">
       <Project>{0c524540-0b5b-40f9-a094-9061c7ebc8a2}</Project>
       <Name>NB.Core.Web</Name>

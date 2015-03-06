@@ -13,26 +13,26 @@ using System.Web;
 
 namespace NB.Core.Web.DownloadClient
 {
-    public class NasdaqEarningForecastDownloadClient : BaseDownloader<NasdaqEarningForecastResult>
+    public class NasdaqEarningForecastDownloader : BaseDownloader<NasdaqEarningForecastResult>
     {
-        public NasdaqEarningForecastDownloadClient(BaseSetting setting) : base (setting)
+        public NasdaqEarningForecastDownloader(BaseSetting setting) : base (setting)
         {
 
         }
 
-        public NasdaqEarningForecastDownloadClient()
-            : base(new NasdaqEarningForecastDownloadSetting())
+        public NasdaqEarningForecastDownloader()
+            : this(new NasdaqEarningForecastDownloadSetting())
         {
         }
 
-        protected override NasdaqEarningForecastResult ConvertResult(string contentStr, string ticker = "")
+        protected sealed override NasdaqEarningForecastResult ConvertResult(string contentStr, string ticker = "")
         {
             List<NasdaqEarningForecastData> yearly = new List<NasdaqEarningForecastData>(10);
             List<NasdaqEarningForecastData> quarterly = new List<NasdaqEarningForecastData>(10);
             System.Globalization.CultureInfo culture = MyHelper.DefaultCulture;
             string pattern = @"<title>.*\((\w*)\).*</title>";
 
-            if (string.IsNullOrEmpty(contentStr))
+            if (!string.IsNullOrEmpty(contentStr))
             {
                 var content = contentStr;
 
@@ -50,38 +50,7 @@ namespace NB.Core.Web.DownloadClient
                 resultNode = XPath.GetElement("//table", quarter);
                 ParseTable(quarterly, resultNode, symbol, "");
 
-                return new NasdaqEarningForecastResult(yearly.ToArray(), quarterly.ToArray());
-            }
-            return null;
-        }
-
-        protected override NasdaqEarningForecastResult ConvertResult(StreamReader streamReader, string ticker = "")
-        {
-            List<NasdaqEarningForecastData> yearly = new List<NasdaqEarningForecastData>(10);
-            List<NasdaqEarningForecastData> quarterly = new List<NasdaqEarningForecastData>(10);
-            System.Globalization.CultureInfo culture = MyHelper.DefaultCulture;
-            string pattern = @"<title>.*\((\w*)\).*</title>";
-            var stream = streamReader.BaseStream;
-            if (stream != null)
-            {
-                
-                var content = MyHelper.StreamToString(stream, System.Text.Encoding.UTF8);
-
-                var matchPattern = "(<div class=\"genTable\">.*?</div>)";
-                var match = Regex.Matches(content, matchPattern, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);
-
-                XParseDocument year = MyHelper.ParseXmlDocument(match[0].Groups[0].Value);
-                XParseDocument quarter = MyHelper.ParseXmlDocument(match[1].Groups[0].Value);
-
-
-                var symbol = Regex.Match(content, pattern).Groups[1].Value;
-                var resultNode = XPath.GetElement("//table", year);
-                ParseTable(yearly, resultNode, symbol, "");
-
-                resultNode = XPath.GetElement("//table", quarter);
-                ParseTable(quarterly, resultNode, symbol, "");
-
-                return new NasdaqEarningForecastResult(yearly.ToArray(), quarterly.ToArray());
+                return new NasdaqEarningForecastResult(yearly.ToArray(), quarterly.ToArray(), ticker);
             }
             return null;
         }

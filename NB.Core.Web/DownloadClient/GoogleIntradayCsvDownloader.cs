@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace NB.Core.Web.DownloadClient
 {
-    public class GoogleIntradayCsvDownloader : BaseDownloader<IEnumerable<PriceData>>
+    public class GoogleIntradayCsvDownloader : BaseDownloader<IEnumerable<PriceDataPoint>>
     {
         private const string columnSeparator = ";";
         public GoogleIntradayCsvDownloader(BaseSetting setting)
@@ -23,9 +23,9 @@ namespace NB.Core.Web.DownloadClient
         }
 
 
-        protected override IEnumerable<PriceData> ConvertResult(StreamReader reader, string ticker = "")
+        protected override IEnumerable<PriceDataPoint> ConvertResult(StreamReader reader, string ticker = "")
         {
-            var list = new List<PriceData>(200);
+            var list = new List<PriceDataPoint>(200);
             string headerLine;
             headerLine = reader.ReadLine();
             headerLine = reader.ReadLine();
@@ -52,18 +52,18 @@ namespace NB.Core.Web.DownloadClient
                 csvReader.Configuration.RegisterClassMap<PriceDataGoogleMapping>();
                 while (csvReader.Read())
                 {
-                    var data = csvReader.GetRecord<PriceData>();
+                    var data = csvReader.GetRecord<PriceDataPoint>();
                     list.Add(data);
                 }
             }
             
-            return list.ToArray<PriceData>();
+            return list.ToArray<PriceDataPoint>();
         }
 
-        protected override IEnumerable<PriceData> ConvertResult(string contentStr, string ticker = "")
+        protected override IEnumerable<PriceDataPoint> ConvertResult(string contentStr, string ticker = "")
         {
             //https://github.com/JoshClose/CsvHelper/blob/master/src/CsvHelper.Example/Program.cs
-            var list = new List<PriceData>(200);
+            var list = new List<PriceDataPoint>(200);
             using (var reader = MyHelper.GetStreamReader(contentStr))
             {
                 /*
@@ -90,12 +90,12 @@ namespace NB.Core.Web.DownloadClient
                     csvReader.Configuration.RegisterClassMap<PriceDataGoogleMapping>();
                     while (csvReader.Read())
                     {
-                        var data = csvReader.GetRecord<PriceData>();
+                        var data = csvReader.GetRecord<PriceDataPoint>();
                         list.Add(data);
                     }
                 }
             }
-            return list.ToArray<PriceData>();
+            return list.ToArray<PriceDataPoint>();
         }
     }
 }

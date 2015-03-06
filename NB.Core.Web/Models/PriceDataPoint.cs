@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NB.Core.Web.Models
 {
-    public class PriceData
+    public class PriceDataPoint
     {
         public string Timestamp { get; set; }
 

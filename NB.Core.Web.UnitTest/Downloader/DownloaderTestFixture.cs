@@ -17,16 +17,19 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Web.Script.Serialization;
+using NB.Core.Web.DataAccess.Repository;
+using System.Xml.Serialization;
+using System.Xml.Linq;
 
 namespace NB.Core.Web.UnitTest
 {
     [TestClass]
     public class DownloaderTest
     {//^TNX,TQQQ";/*
-        string tickers = @"BIB,CURE,AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
-            FB,LNKD,TWTR,JD,JMEI,TKMR,CELG,REGN,BIIB,ICPT,PCYC,INCY,DATA,NOW,GILD,SPLK,TSO,
+        string tickers = @"AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
+            FB,LNKD,TWTR,JD,JMEI,DATA,NOW,GILD,SPLK,TSO,
             LNG,EOG,APC,GPRO,NUAN,RCL,MCO,DFS,AXP,MA,V,GS,BAC,JPM,
-            C,JUNO,KITE,BLUE,GMCR";
+            C,JUNO,KITE,BLUE,GMCR,PCYC,INCY,GEVA,ACAD,TKMR,CELG,REGN,BIIB,ICPT";
 
         string index = @"SPY,IWM,TQQQ,BIB,CURE,XLE,XLF,EEM,FXI,RTH, XTN";//TZA,TNA,
 
@@ -227,7 +230,7 @@ namespace NB.Core.Web.UnitTest
             double inflation = 0.02; //todo: get from yahoo quote
             double fixincomeReturnRate = 0.0795; //todo: get from yahoo quote
             var setting = new CompanyStatisticsDownloadSetting("CSCO");
-            var dl = new YahooCompanyStatisticsDownload(setting);
+            var dl = new YahooCompanyStatisticsDownloader(setting);
             var bag = new ConcurrentBag<CompanyStatisticsData>();
             var results = await dl.BatchDownloadObjectsTaskAsync(setting.GetUrls(tickers)).ConfigureAwait(false);
 
@@ -249,7 +252,7 @@ namespace NB.Core.Web.UnitTest
                 var ti = result.Item.TradingInfo;
                 var vm = result.Item.ValuationMeasures;
                 var highlight = result.Item.FinancialHighlights;
-                var eps = highlight.DilutedEPS;
+                var eps = result.Item.FinancialHighlights.DilutedEPS;
 
                 // var growthRate1 = vm.TrailingPE / vm.ForwardPE;
                 var growthRate = highlight.QuarterlyRevenueGrowthPercent;//.QuaterlyEarningsGrowthPercent /100.0;
@@ -323,9 +326,88 @@ namespace NB.Core.Web.UnitTest
         [TestMethod]
         public async Task GetNasdaqEarningForcast()
         {
-            var setting = new NasdaqEarningForecastDownloadSetting("JD");
-            var downloader = new NasdaqEarningForecastDownloadClient(setting);
+            var setting = new NasdaqEarningForecastDownloadSetting("LNG");
+            var downloader = new NasdaqEarningForecastDownloader(setting);
+            var result = await downloader.BatchDownloadObjectsStreamTaskAsync(setting.GetUrls(tickers)).ConfigureAwait(false);
+         //   var item = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
+            //foreach (var q in result.QuarterlyEarningForecasts)
+            //{
+            //    Console.WriteLine(q..ConsensusEpsForecast)
+            //}
+            //var serializer = new JavaScriptSerializer();
+            //String json = serializer.Serialize(result);
+            //Debug.WriteLine(json);
+            //var column1 = "Ticker"; var col1With = column1.Length + 2;
+            //var column2 = "Q2Q Growth"; var col2With = column2.Length + 8;
+            //var column3 = "Y2Y Growth"; var col3With = column3.Length + 8;
+            //Console.Write(column1.PadRight(col1With, '.'));
+            //Console.Write(column2.PadLeft(col2With, '.'));
+            //Console.WriteLine(column3.PadLeft(col3With, '.'));
+            var orderResult = result.OrderByDescending(item => { if (item.YearlyEarningForecasts.Length == 0) return double.NaN; return item.YearlyEarningForecasts.Last().ConsensusEpsForecast; });
+            foreach (var item in orderResult)
+            {
+                try
+                {
+                    Console.WriteLine(item.ToString());
+                    //Console.Write(item.Ticker.PadRight(col1With, '.'));
+                    //Console.Write(item.QuartylyEarningGrowth.ToString("p").PadLeft(col2With,'.'));
+                    //Console.WriteLine(item.QuartylyEarningGrowth.ToString("p").PadLeft(col3With, '.'));
+                //{
+                //    Console.WriteLine("ticker: {0}          q2q growth: {1}                    y2y growth: {2}", 
+                //        item.Ticker.PadRight(6), 
+                //        item.QuartylyEarningGrowth.ToString("p").PadLeft(25), 
+                //        item.YearlyEarningGrowth.ToString("p").PadLeft(25));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(item.Ticker + "  " + ex.Message);
+                }
+                 //foreach (var y in item.YearlyEarningForecasts)
+                 //{
+                 //    PrintProperties(y, 0);
+                 //}
+
+                 //foreach (var q in item.QuarterlyEarningForecasts)
+                 //{
+                 //    PrintProperties(q, 0);
+                 //}
+            }
+        }
+
+        [TestMethod]
+        public async Task GetSPYValuationHistoryMetrics()
+        {
+            var setting = new SPYValuationDownloadSetting("SPY");
+            var downloader = new SPYValuationDownloader(setting);
             var result = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
+            foreach (var item in result.Items)
+            {
+
+                Console.WriteLine("ticker: SPY - {0} Date: {1} Value: {2}", result.MetricsType.ToString(), item.Date, item.Value);
+            }
+        }
+
+        [TestMethod]
+        public async Task GetMorningStarValuationHistoryMetrics()
+        {
+            var setting = new MorningStarValuationSetting("AMZN");
+            var downloader = new MorningStartValuationDownloader(setting);
+            var curVal = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
+
+            setting.IsForwardValuation = true;
+            var forwardVal = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
+            PrintProperties(curVal, 0);
+
+            PrintProperties(forwardVal, 0);
+        }
+
+        [TestMethod]
+        public async Task GetNasdaqEarningHistory()
+        {
+            var setting = new NasdaqEarningHistoryDownloadSetting("PCYC");
+            var downloader = new NasdaqEarningHistoryDownloader(setting);
+            var result = await downloader.BatchDownloadObjectsStreamTaskAsync(setting.GetUrls("PCYC,INCY,GEVA,ACAD")).ConfigureAwait(false);
+            // var result = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
             //foreach (var q in result.QuarterlyEarningForecasts)
             //{
             //    Console.WriteLine(q..ConsensusEpsForecast)
@@ -333,15 +415,35 @@ namespace NB.Core.Web.UnitTest
             var serializer = new JavaScriptSerializer();
             String json = serializer.Serialize(result);
             Debug.WriteLine(json);
-            foreach (var q in result.YearlyEarningForecasts)
+            foreach (var item in result)
             {
-                PrintProperties(q, 0);
+           //      foreach (var q in result.Items)//item.Items)
+                {
+                   // PrintProperties(q, 0);
+                    Console.WriteLine("ticker: {0} growth: {1}", item.Ticker, item.QuartylyEarningGrowth);
+                }
             }
+        }
 
-            foreach (var q in result.QuarterlyEarningForecasts)
-            {
-                PrintProperties(q, 0);
-            }
+        [TestMethod]
+        public async Task SpyDataRepositoryTest()
+        {
+            var setting = new SPYValuationDownloadSetting("SPY");
+            var downloader = new SPYValuationDownloader(setting);
+            var result = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
+
+            setting.Valuationtype = ValuationType.PB;
+            var result2 = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
+            var repo = new SpyDataRepository();
+            repo.Save(result, result2);
+
+            var result_ = repo.Load();
+            //var xmlSerializer = new XmlSerializer(typeof(MetricsDataPointResult));
+            //using (var reader = XDocument.CreateReader())
+            //{
+            //    var val = (MetricsDataPointResult)xmlSerializer.Deserialize(reader);
+            //} 
+            
         }
 
         public void PrintProperties(object obj, int indent)

@@ -15,12 +15,7 @@ namespace NB.Core.Web.DownloadClient
             
         }
 
-        protected override YahooQuotesResult ConvertResult(StreamReader sr, string ticker = "")
-        {
-            throw new NotImplementedException("stream is only for csv files.");
-        }
-
-        protected override YahooQuotesResult ConvertResult(string contentStr, string ticker = "")
+        protected sealed override YahooQuotesResult ConvertResult(string contentStr, string ticker = "")
         {
             YahooQuotesData[] items=null;
             YahooQuotesDownloadSettings set = (YahooQuotesDownloadSettings)this.Setting;

@@ -33,12 +33,12 @@ namespace NB.Core.Web.DownloadSettings
 		{
 			Ticker = ticker;
 			PeriodInSeconds = 180;
-            TimezoneOffset = -300;
+			TimezoneOffset = -300;
 		}
 
 		public int PeriodInSeconds { get; set; }
-        public int TimezoneOffset { get; set; }
-        
+		public int TimezoneOffset { get; set; }
+		
 		protected sealed override string UrlStr
 		{
 			get { return "http://www.google.com/finance/getprices?q={0}&i={1}&p=1000d&df=cpct&f=d,o,h,l,c,v"; }

@@ -12,7 +12,7 @@ using System.Threading;
 
 namespace NB.Core.Web.DownloadClient
 {
-    public class YahooHistoryCsvDownloader : BaseDownloader<IEnumerable<PriceData>>
+    public class YahooHistoryCsvDownloader : BaseDownloader<IEnumerable<PriceDataPoint>>
     {
         private const string columnSeparator = ";";
         public YahooHistoryCsvDownloader(BaseSetting setting)
@@ -21,10 +21,9 @@ namespace NB.Core.Web.DownloadClient
             
         }
 
-        protected override IEnumerable<PriceData> ConvertResult(StreamReader sr, string ticker = "")
+        protected override IEnumerable<PriceDataPoint> ConvertResult(StreamReader sr, string ticker = "")
         {
-            var list = new ConcurrentBag<PriceData>();
-        //    var header = sr.ReadLine();
+            var list = new ConcurrentBag<PriceDataPoint>();
             using (var csvReader = new CsvReader(sr))
             {
                 csvReader.Configuration.RegisterClassMap<PriceDataYahooMapping>();
@@ -32,7 +31,7 @@ namespace NB.Core.Web.DownloadClient
                 {
                     try
                     {
-                        var data = csvReader.GetRecord<PriceData>();
+                        var data = csvReader.GetRecord<PriceDataPoint>();
                         list.Add(data);
                     }
                     catch (Exception ex)
@@ -42,13 +41,13 @@ namespace NB.Core.Web.DownloadClient
                 }
                 sr.Close();
             }
-            return list.ToArray<PriceData>();
+            return list.ToArray<PriceDataPoint>();
         }
 
-        protected override IEnumerable<PriceData> ConvertResult(string contentStr, string ticker = "")
+        protected override IEnumerable<PriceDataPoint> ConvertResult(string contentStr, string ticker = "")
         {
             //https://github.com/JoshClose/CsvHelper/blob/master/src/CsvHelper.Example/Program.cs
-            var list = new List<PriceData>();
+            var list = new List<PriceDataPoint>();
             //var list = new ThreadLocal<List<PriceData>>();
             using (var reader = MyHelper.GetStreamReader(contentStr))
             using (var csvReader = new CsvReader (reader))
@@ -56,11 +55,11 @@ namespace NB.Core.Web.DownloadClient
                 csvReader.Configuration.RegisterClassMap<PriceDataYahooMapping>();
                 while (csvReader.Read())
                 {
-                    var data = csvReader.GetRecord<PriceData>();
+                    var data = csvReader.GetRecord<PriceDataPoint>();
                     list.Add(data);
                 }
             }
-            return list.ToArray<PriceData>();
+            return list.ToArray<PriceDataPoint>();
         }
     }
 }

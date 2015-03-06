@@ -10,18 +10,23 @@ using System.Threading.Tasks;
 
 namespace NB.Core.Web.DownloadSettings
 {
-	public class FinvizDetailsSetting: BaseSetting
+	public class MorningStarValuationSetting: BaseSetting
 	{
-			/*"https:/table/query.yahooapis.com/v1/public/yql?q=select * from html where url=\'http:/table/www.finviz.com/quote.ashx?t={0}\' and xpath=\'/html/body/table/table[@class=\"snapshot-table2\"]/tr\'";*/
-
-		public FinvizDetailsSetting(string ticker = "SPY")
+		public MorningStarValuationSetting(string ticker = "SPY")
 		{
 			Ticker = ticker;
+			IsForwardValuation = false;
 		}
 
 		protected sealed override string UrlStr
 		{
-			get { return "http://www.finviz.com/quote.ashx?t={0}"; }
+			get 
+			{
+				if (IsForwardValuation)
+					return "http://financials.morningstar.com/valuation/forward-valuation-list.action?&t=XNAS:AMZN&region=usa&culture=en-US";
+
+				return "http://financials.morningstar.com/valuation/current-valuation-list.action?&t=XNAS:{0}&region=usa&culture=en-US"; 
+			}
 		}
 
 		public override string GetFileName(string ticker)
@@ -36,7 +41,7 @@ namespace NB.Core.Web.DownloadSettings
 
 		public override string GetTickerFromUrl(string url)
 		{
-			var ticker = MyHelper.ExtractPattern(url, @".*quote.ashx\?t=(?<ticker>\w*)\'\s.*");
+			var ticker = MyHelper.ExtractPattern(url, @".*current-valuation-list\.action\?&t=XNAS:(?<ticker>\w*)&.*");
 			return ticker;
 		}
 
@@ -49,5 +54,7 @@ namespace NB.Core.Web.DownloadSettings
 		{
 			return string.Format(UrlStr, ticker);
 		}
+
+		public bool IsForwardValuation { get; set; }
 	}
 }

@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace NB.Core.Web.DownloadClient
 {
-    public class YahooCompanyStatisticsDownload : BaseDownloader<CompanyStatisticsResult>
+    public class YahooCompanyStatisticsDownloader : BaseDownloader<CompanyStatisticsResult>
     {
-        public YahooCompanyStatisticsDownload( BaseSetting setting) : base (setting)
+        public YahooCompanyStatisticsDownloader( BaseSetting setting) : base (setting)
         {
 
         }
@@ -284,9 +284,5 @@ namespace NB.Core.Web.DownloadClient
             return new CompanyStatisticsResult(result);
         }
 
-        protected override CompanyStatisticsResult ConvertResult(StreamReader streamReader, string ticker = "")
-        {
-             throw new NotImplementedException();
-        }
     }
 }

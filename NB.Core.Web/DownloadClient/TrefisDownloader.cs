@@ -15,11 +15,6 @@ namespace NB.Core.Web.DownloadClient
         {
 
         }
-
-        protected override TrefisCompanyCoveredInfoResult ConvertResult(StreamReader sr, string ticker = "")
-        {
-            throw new NotImplementedException("stream is only for csv files.");
-        }
         
         protected override TrefisCompanyCoveredInfoResult ConvertResult(string contentStr, string ticker = "")
         {
@@ -71,32 +66,14 @@ namespace NB.Core.Web.DownloadClient
             XParseElement tempNode = null;
             foreach (XParseElement row in results)
             {
-              //  var data = new TrefisCompanyCoveredInfoData();
-                
-                //data.CompanyName = tempNode.Value;
                 tempNode = XPath.GetElement("/td[1]/a", row);
                 var data = dataList.Where(company => company.CompanyName == HttpUtility.HtmlDecode(tempNode.Value)).FirstOrDefault();
-                
-
-               // data.Ticker = this.Setting.GetTickerFromUrl(tempNode.Attribute(new XParseName("href")).Value);
-
-                //tempNode = XPath.GetElement("/td[2]/a", row);
-                //data.TrefisTarget = float.Parse(tempNode.Value, NumberStyles.Currency);
-
-               // tempNode = XPath.GetElement("/td[3]", row);
-               // data.PriceGap = float.Parse(tempNode.Value, NumberStyles.Currency);
-
                 tempNode = XPath.GetElement("/td[4]", row);
                 data.Sector = tempNode.Value;
 
                 tempNode = XPath.GetElement("/td[5]", row);
                 data.Industry = tempNode.Value;
 
-               // this is empty because jqote rearrange the data after document is ready, but response has already returned
-               // tempNode = XPath.GetElement("/td[6]", row);
-               
-
-              //  companies.Add(data);
             }
 
             return new TrefisCompanyCoveredInfoResult(dataList.ToArray());

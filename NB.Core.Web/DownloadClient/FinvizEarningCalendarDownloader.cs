@@ -20,11 +20,6 @@ namespace NB.Core.Web.DownloadClient
 
         }
 
-        protected override TickerEarningDate ConvertResult(StreamReader sr, string ticker = "")
-        {
-            throw new NotImplementedException("stream is only for csv files.");
-        }
-
         protected override TickerEarningDate ConvertResult(string contentStr, string ticker="")
         {
             XParseDocument doc = MyHelper.ParseXmlDocument(contentStr);
