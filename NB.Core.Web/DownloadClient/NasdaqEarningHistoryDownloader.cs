@@ -15,7 +15,7 @@ using System.Web;
 
 namespace NB.Core.Web.DownloadClient
 {
-    public class NasdaqEarningHistoryDownloader : BaseDownloader<EarningHistoryResult>
+    public class NasdaqEarningHistoryDownloader : BaseDownloader<EarningHistoryDataAggregate>
     {
         public NasdaqEarningHistoryDownloader(BaseSetting setting) : base (setting)
         {
@@ -23,11 +23,11 @@ namespace NB.Core.Web.DownloadClient
         }
 
         public NasdaqEarningHistoryDownloader()
-            : this(new NasdaqEarningHistoryDownloadSetting())
+            : this(new NasdaqEarningHistorySetting())
         {
         }
 
-        protected override EarningHistoryResult ConvertResult(string content, string ticker = "")
+        protected override EarningHistoryDataAggregate ConvertResult(string content, string ticker = "")
         {
             List<EarningHistoryData> history = new List<EarningHistoryData>(10);
             var matchPattern = "(<div class=\"genTable\">.*?</div>)";
@@ -37,7 +37,7 @@ namespace NB.Core.Web.DownloadClient
 
             var resultNode = XPath.GetElement("//table", doc);
             ParseTable(history, resultNode, ticker, "");
-            return new EarningHistoryResult(history.ToArray(), ticker);
+            return new EarningHistoryDataAggregate(history.ToArray(), ticker);
         }
 
         private static void ParseTable(List<EarningHistoryData> earningHistory, XParseElement sourceNode, string symbol, string xPath)

@@ -7,7 +7,7 @@ using System.IO;
 
 namespace NB.Core.Web.DownloadClient
 {
-    public class YahooQuotesDownloader : BaseDownloader<YahooQuotesResult>
+    public class YahooQuotesDownloader : BaseDownloader<YahooQuotesAggregate>
     {
         public YahooQuotesDownloader(BaseSetting setting)
             : base(setting)
@@ -15,16 +15,16 @@ namespace NB.Core.Web.DownloadClient
             
         }
 
-        protected sealed override YahooQuotesResult ConvertResult(string contentStr, string ticker = "")
+        protected sealed override YahooQuotesAggregate ConvertResult(string contentStr, string ticker = "")
         {
             YahooQuotesData[] items=null;
-            YahooQuotesDownloadSettings set = (YahooQuotesDownloadSettings)this.Setting;
+            YahooQuotesSettings set = (YahooQuotesSettings)this.Setting;
             items = FinanceHelper.ImportExport.ToQuotesData(contentStr,
                                                               ',',
                                                               set.Properties,
                                                               MyHelper.DefaultCulture);
             
-            return new YahooQuotesResult(items, set);
+            return new YahooQuotesAggregate(items, set);
         }
     }
 }

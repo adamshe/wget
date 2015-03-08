@@ -19,4 +19,31 @@ namespace NB.Core.Web.Models
 
         public float SurprisePercentage { get { return EarningActual / EarningConsensusForecast - 1; } }
     }
+
+    public class EarningHistoryDataAggregate
+    {
+        private EarningHistoryData[] mItems = null;
+
+        public string Ticker { get; set; }
+        public EarningHistoryData[] Items
+        {
+            get { return mItems; }
+        }
+
+        internal EarningHistoryDataAggregate(EarningHistoryData[] items, string ticker = "")
+        {
+            mItems = items;
+            Ticker = ticker;
+        }
+
+        public double QuartylyEarningGrowth
+        {
+            get
+            {
+                var totalGrowth = mItems.Last().EarningActual - mItems.First().EarningActual;
+                var howManyYears = mItems.Length;
+                return Math.Pow(totalGrowth, 1.0 / howManyYears);
+            }
+        }
+    }
 }

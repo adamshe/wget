@@ -1,16 +1,15 @@
 ﻿using NB.Core.Web.Interfaces;
 using System;
-using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using NB.Core.Web.Utility;
 using System.Collections.Generic;
 using NB.Core.Web.DownloadSettings;
-using System.Text.RegularExpressions;
 using System.Net;
 using System.Diagnostics;
 using NB.Core.Web.Extensions;
+using System.Text;
 namespace NB.Core.Web.DownloadClient
 {
     public abstract class BaseDownloader<T> : IDownload<T>, IBatchDownload<T>, IPostDownLoad<T>
@@ -88,7 +87,7 @@ namespace NB.Core.Web.DownloadClient
             var stream = streamReader.BaseStream;
             if (stream != null)
             {
-                var content = MyHelper.StreamToString(stream, System.Text.Encoding.UTF8);
+                var content = MyHelper.StreamToString(stream, Encoding.UTF8);
                 return ConvertResult(content, ticker);
             }
             return default(T);

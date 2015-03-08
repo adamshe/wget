@@ -424,6 +424,11 @@ namespace NB.Core.Web.Utility
             return Regex.Replace(originalFix, @"\s+", string.Empty);
         }
 
+        public static string FixAttributes(string original)
+        {
+            return Regex.Replace(original,@"[\s\t\r\n]*=""?([a-zA-Z0-9%-\.:/\?=]+)""?[\s\t\r\n]*", @"=""$+"" ");
+        }
+
         public static string[] GetStringToken (string str, string[] delimiter)
         {
             string fixSymbols = MyHelper.FixString(str);

@@ -10,7 +10,7 @@ using System;
 
 namespace NB.Core.Web.DownloadClient
 {
-    public class SPYValuationDownloader : BaseDownloader<MetricsDataPointResult>
+    public class SPYValuationDownloader : BaseDownloader<SPYValuationDataPointAggregate>
     {
 
         public SPYValuationDownloader(BaseSetting setting) : base(setting)
@@ -18,16 +18,16 @@ namespace NB.Core.Web.DownloadClient
 
         }
 
-        protected override MetricsDataPointResult ConvertResult(string content, string ticker = "")
+        protected override SPYValuationDataPointAggregate ConvertResult(string content, string ticker = "")
         {
-            List<MetricsDataPoint> history = new List<MetricsDataPoint>(100);
+            List<SPYValuationDataPoint> history = new List<SPYValuationDataPoint>(100);
 
             var resultNode = MyHelper.GetResultTable(content, "(<table id=\"datatable\">.*?</table>)", "//table");
             ParseTable(history, resultNode, ticker, "");
-            return new MetricsDataPointResult((Setting as SPYValuationDownloadSetting).Valuationtype, history.ToArray(), ticker);
+            return new SPYValuationDataPointAggregate((Setting as SPYValuationSetting).Valuationtype, history.ToArray(), ticker);
         }
 
-        private static void ParseTable(List<MetricsDataPoint> metricsHistory, XParseElement sourceNode, string symbol, string xPath)
+        private static void ParseTable(List<SPYValuationDataPoint> metricsHistory, XParseElement sourceNode, string symbol, string xPath)
         {
             var resultNode = sourceNode;
             if (!(string.IsNullOrWhiteSpace(xPath) || string.IsNullOrEmpty(xPath)))
@@ -45,7 +45,7 @@ namespace NB.Core.Web.DownloadClient
                         cnt++;
                         if (cnt > 1) // skip row header
                         {
-                            var data = new MetricsDataPoint();
+                            var data = new SPYValuationDataPoint();
                             foreach (var property in data.GetType().GetProperties())
                             {
                                 xpath = property.GetCustomAttributes(typeof(XPathAttribute), false).FirstOrDefault() as XPathAttribute;

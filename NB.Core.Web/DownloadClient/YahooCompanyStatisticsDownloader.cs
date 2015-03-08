@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 
 namespace NB.Core.Web.DownloadClient
 {
-    public class YahooCompanyStatisticsDownloader : BaseDownloader<CompanyStatisticsResult>
+    public class YahooCompanyStatisticsDownloader : BaseDownloader<CompanyStatisticsAggregate>
     {
         public YahooCompanyStatisticsDownloader( BaseSetting setting) : base (setting)
         {
 
         }
 
-        protected override CompanyStatisticsResult ConvertResult(string contentStr, string ticker = "")
+        protected override CompanyStatisticsAggregate ConvertResult(string contentStr, string ticker = "")
         {
             CompanyStatisticsData result = null;
             XParseDocument doc = MyHelper.ParseXmlDocument(contentStr);
@@ -281,7 +281,7 @@ namespace NB.Core.Web.DownloadClient
 
                 result = new CompanyStatisticsData(ticker, vm, fh, cti);
             }
-            return new CompanyStatisticsResult(result);
+            return new CompanyStatisticsAggregate(result);
         }
 
     }

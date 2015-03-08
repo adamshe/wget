@@ -14,26 +14,26 @@ namespace NB.Core.Web.DataAccess.Repository
     //http://www.multpl.com/s-p-500-price/
     public class SpyDataRepository
     {
-        public MetricsDataPointResult GetByDate(DateTime date, ValuationType valType)
+        public SPYValuationDataPointAggregate GetByDate(DateTime date, ValuationType valType)
         {
-            var result = new MetricsDataPointResult(valType);
+            var result = new SPYValuationDataPointAggregate(valType);
             return result;
         }
 
-        public void Save (string filePath=@"c:\temp\spy.xml", params MetricsDataPointResult[] data )
+        public void Save (string filePath=@"c:\temp\spy.xml", params SPYValuationDataPointAggregate[] data )
         {
             var doc = CreateXmlFromObjects("root", data);
             doc.Save(filePath);
         }
 
-        public MetricsDataPointResult[] Load(string filePath)
+        public SPYValuationDataPointAggregate[] Load(string filePath)
         {
             var doc = XDocument.Load(filePath);
-            var list = new List<MetricsDataPointResult>(3);
+            var list = new List<SPYValuationDataPointAggregate>(3);
             foreach (var element in doc.Root.Elements("Result"))
             {
                 var reader = element.CreateReader();
-                var data = new XmlSerializer(typeof(MetricsDataPointResult)).Deserialize(reader) as MetricsDataPointResult;
+                var data = new XmlSerializer(typeof(SPYValuationDataPointAggregate)).Deserialize(reader) as SPYValuationDataPointAggregate;
                 list.Add(data);
             }
             return list.ToArray();

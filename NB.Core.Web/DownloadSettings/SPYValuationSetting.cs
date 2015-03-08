@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace NB.Core.Web.DownloadSettings
 {
-	public class SPYValuationDownloadSetting: BaseSetting
+	public class SPYValuationSetting: BaseSetting
 	{
-		public SPYValuationDownloadSetting(string ticker = "SPY")
+		public SPYValuationSetting(string ticker = "SPY")
 		{
 			Ticker = ticker;
 			Valuationtype = ValuationType.PE;

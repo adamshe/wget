@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace NB.Core.Web.DownloadSettings
 {
-    public class NasdaqEarningForecastDownloadSetting : BaseSetting
+    public class NasdaqEarningHistorySetting : BaseSetting
     {
-        public NasdaqEarningForecastDownloadSetting()
+        public NasdaqEarningHistorySetting()
         {
             this.Ticker = string.Empty;
         }
 
-        public NasdaqEarningForecastDownloadSetting(string ticker)
+        public NasdaqEarningHistorySetting(string ticker)
         {
             this.Ticker = ticker;
         }
@@ -32,12 +32,12 @@ namespace NB.Core.Web.DownloadSettings
 
         protected sealed override string UrlStr
         {
-            get { return "http://www.nasdaq.com/symbol/{0}/earnings-forecast"; }
+            get { return "http://www.nasdaq.com/earnings/report/{0}"; }
         }
 
         public override string GetTickerFromUrl(string url)
         {
-            var ticker = MyHelper.ExtractPattern(url, @".*symbol/(?<ticker>\w*)/earnings-forecast$");
+            var ticker = MyHelper.ExtractPattern(url, @".*report/(?<ticker>\w*)");
             return ticker;
         }
     }

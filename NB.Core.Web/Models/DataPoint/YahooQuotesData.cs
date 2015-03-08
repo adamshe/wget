@@ -1,4 +1,5 @@
-﻿using NB.Core.Web.Enums;
+﻿using NB.Core.Web.DownloadSettings;
+using NB.Core.Web.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,38 @@ using System.Threading.Tasks;
 
 namespace NB.Core.Web.Models
 {
+    public class YahooQuotesAggregate : QuotesBaseAggregate
+    {
+        private YahooQuotesSettings mSettings = null;
+        public YahooQuotesSettings Settings { get { return mSettings; } }
+
+        public new YahooQuotesData[] Items
+        {
+            get
+            {
+                return base.Items.Cast<YahooQuotesData>().ToArray();
+            }
+        }
+
+        public void SortBy(QuoteProperty property)
+        {
+            try
+            {
+                base.Items = base.Items.OrderBy(item => ((YahooQuotesData)item)[property] ?? double.MinValue).ToArray();
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        internal YahooQuotesAggregate(YahooQuotesData[] items, YahooQuotesSettings settings)
+            : base(items)
+        {
+            mSettings = settings;
+        }
+    }
+
     public class YahooQuotesData : QuotesBaseData, ICloneable
     {
 

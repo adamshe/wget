@@ -5,6 +5,17 @@ using System.Text;
 
 namespace NB.Core.Web.Models
 {
+    public class QuotesBaseAggregate
+    {
+        private QuotesBaseData[] mItems = null;
+        public QuotesBaseData[] Items { get { return mItems; } protected set { mItems = value; } }
+
+        public QuotesBaseAggregate(QuotesBaseData[] items)
+        {
+            mItems = items;
+        }
+    }
+
     public class QuotesBaseData
     {
 

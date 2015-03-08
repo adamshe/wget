@@ -11,13 +11,13 @@ namespace NB.Core.Web.Models
 {
     [Serializable]
     [XmlRoot("Result")]
-    public class MetricsDataPointResult
+    public class SPYValuationDataPointAggregate
     {
-        public MetricsDataPointResult()
+        public SPYValuationDataPointAggregate()
         {
 
         }
-        public MetricsDataPointResult(ValuationType type, MetricsDataPoint[] items = null, string ticker = "SPY")
+        public SPYValuationDataPointAggregate(ValuationType type, SPYValuationDataPoint[] items = null, string ticker = "SPY")
         {
             _items = items;
             Ticker = ticker;
@@ -30,14 +30,14 @@ namespace NB.Core.Web.Models
         [XmlAttribute]
         public ValuationType MetricsType { get; set; }
 
-        private MetricsDataPoint[] _items;
+        private SPYValuationDataPoint[] _items;
 
         [XmlArray]
-        public MetricsDataPoint[] Items { get { return _items; } set{_items = value;} }
+        public SPYValuationDataPoint[] Items { get { return _items; } set{_items = value;} }
     }
 
     
-    public class MetricsDataPoint
+    public class SPYValuationDataPoint
     {        
 
         [XPath("/td[1]")]

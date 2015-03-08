@@ -129,7 +129,7 @@ namespace NB.Core.Web.UnitTest
         [TestMethod]
         public async Task YahooQuotesDownloaderTest()
         {
-            var setting = new YahooQuotesDownloadSettings();
+            var setting = new YahooQuotesSettings();
             setting.Properties = new QuoteProperty[] {
                 QuoteProperty.LastTradePriceOnly,
                 QuoteProperty.ChangeInPercent,
@@ -229,7 +229,7 @@ namespace NB.Core.Web.UnitTest
         {
             double inflation = 0.02; //todo: get from yahoo quote
             double fixincomeReturnRate = 0.0795; //todo: get from yahoo quote
-            var setting = new CompanyStatisticsDownloadSetting("CSCO");
+            var setting = new CompanyStatisticsSetting("CSCO");
             var dl = new YahooCompanyStatisticsDownloader(setting);
             var bag = new ConcurrentBag<CompanyStatisticsData>();
             var results = await dl.BatchDownloadObjectsTaskAsync(setting.GetUrls(tickers)).ConfigureAwait(false);
@@ -326,7 +326,7 @@ namespace NB.Core.Web.UnitTest
         [TestMethod]
         public async Task GetNasdaqEarningForcast()
         {
-            var setting = new NasdaqEarningForecastDownloadSetting("LNG");
+            var setting = new NasdaqEarningForecastSetting("LNG");
             var downloader = new NasdaqEarningForecastDownloader(setting);
             var result = await downloader.BatchDownloadObjectsStreamTaskAsync(setting.GetUrls(tickers)).ConfigureAwait(false);
          //   var item = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
@@ -377,7 +377,7 @@ namespace NB.Core.Web.UnitTest
         [TestMethod]
         public async Task GetSPYValuationHistoryMetrics()
         {
-            var setting = new SPYValuationDownloadSetting("SPY");
+            var setting = new SPYValuationSetting("SPY");
             var downloader = new SPYValuationDownloader(setting);
             var result = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
             foreach (var item in result.Items)
@@ -404,7 +404,7 @@ namespace NB.Core.Web.UnitTest
         [TestMethod]
         public async Task GetNasdaqEarningHistory()
         {
-            var setting = new NasdaqEarningHistoryDownloadSetting("PCYC");
+            var setting = new NasdaqEarningHistorySetting("PCYC");
             var downloader = new NasdaqEarningHistoryDownloader(setting);
             var result = await downloader.BatchDownloadObjectsStreamTaskAsync(setting.GetUrls("PCYC,INCY,GEVA,ACAD")).ConfigureAwait(false);
             // var result = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
@@ -428,22 +428,33 @@ namespace NB.Core.Web.UnitTest
         [TestMethod]
         public async Task SpyDataRepositoryTest()
         {
-            var setting = new SPYValuationDownloadSetting("SPY");
+            var setting = new SPYValuationSetting("SPY");
             var downloader = new SPYValuationDownloader(setting);
             var result = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
 
             setting.Valuationtype = ValuationType.PB;
             var result2 = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
             var repo = new SpyDataRepository();
-            repo.Save(result, result2);
+            repo.Save(@"c:\temp\spy.xml",result, result2);
 
-            var result_ = repo.Load();
+            var result_ = repo.Load(@"c:\temp\spy.xml");
             //var xmlSerializer = new XmlSerializer(typeof(MetricsDataPointResult));
             //using (var reader = XDocument.CreateReader())
             //{
             //    var val = (MetricsDataPointResult)xmlSerializer.Deserialize(reader);
-            //} 
-            
+            //}             
+        }
+
+        [TestMethod]
+        public async Task ValuationPointTest()
+        {
+            var setting = new YahooValuationSetting();
+            var downloader = new YahooValuationDownloader(setting);
+            var result = await downloader.DownloadObjectStreamTaskAsync(setting.GetUrl("AAPL")).ConfigureAwait(false);
+            PrintProperties(result.Sector, 0);
+            PrintProperties(result.Industry, 0);
+            PrintProperties(result.Self, 0);
+
         }
 
         public void PrintProperties(object obj, int indent)

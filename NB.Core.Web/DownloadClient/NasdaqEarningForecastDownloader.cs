@@ -21,7 +21,7 @@ namespace NB.Core.Web.DownloadClient
         }
 
         public NasdaqEarningForecastDownloader()
-            : this(new NasdaqEarningForecastDownloadSetting())
+            : this(new NasdaqEarningForecastSetting())
         {
         }
 
@@ -29,7 +29,6 @@ namespace NB.Core.Web.DownloadClient
         {
             List<NasdaqEarningForecastData> yearly = new List<NasdaqEarningForecastData>(10);
             List<NasdaqEarningForecastData> quarterly = new List<NasdaqEarningForecastData>(10);
-            System.Globalization.CultureInfo culture = MyHelper.DefaultCulture;
             string pattern = @"<title>.*\((\w*)\).*</title>";
 
             if (!string.IsNullOrEmpty(contentStr))

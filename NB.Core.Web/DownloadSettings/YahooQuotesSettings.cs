@@ -11,25 +11,25 @@ using System.Threading.Tasks;
 
 namespace NB.Core.Web.DownloadSettings
 {
-    public class YahooQuotesDownloadSettings : BaseSetting
+    public class YahooQuotesSettings : BaseSetting
     {
         private QuoteProperty[] _quoteProperties;
         private string[] ids;
 
-        public YahooQuotesDownloadSettings()
+        public YahooQuotesSettings()
         {
             this.IDs = new string[] { };
             this.Properties = new QuoteProperty[] { QuoteProperty.Symbol, QuoteProperty.Name, QuoteProperty.LastTradePriceOnly };
         }
 
-        public YahooQuotesDownloadSettings(string id)
+        public YahooQuotesSettings(string id)
         {
            // this.TextEncoding = System.Text.Encoding.UTF8;
             this.IDs = new string[] { id };
             this.Properties = new QuoteProperty[] { QuoteProperty.Symbol, QuoteProperty.Name, QuoteProperty.LastTradePriceOnly };
         }
 
-        public YahooQuotesDownloadSettings(string id, QuoteProperty[] properties)
+        public YahooQuotesSettings(string id, QuoteProperty[] properties)
         {
             this.IDs = new string[] { id };
             this.Properties = properties;

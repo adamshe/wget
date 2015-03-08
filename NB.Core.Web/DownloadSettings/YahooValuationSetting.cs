@@ -3,12 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace NB.Core.Web.DownloadSettings
 {
-    public class TrefisSetting : BaseSetting
+    public class YahooValuationSetting : BaseSetting
     {
         public override string GetUrl()
         {
@@ -17,20 +16,18 @@ namespace NB.Core.Web.DownloadSettings
 
         public override string GetUrl(string ticker)
         {
-            return GetUrl();
+            return string.Format("http://biz.yahoo.com/rr/?s={0}&d=p%2Frr", ticker);
         }
 
-        protected sealed override string UrlStr
+        protected override string UrlStr
         {
-            get { return "http://www.trefis.com/companies"; }
+            get { return "http://biz.yahoo.com/p/s_conameu.html"; }
         }
-
 
         public override string GetTickerFromUrl(string url)
         {
-            var ticker = MyHelper.ExtractPattern(url, @".*\?hm=(?<ticker>\^?\w*).trefis$");
+            var ticker = MyHelper.ExtractPattern(url, @".*\?s=(?<ticker>\w*)&d=.*Frr$");
             return ticker;
         }
-       
     }
 }
