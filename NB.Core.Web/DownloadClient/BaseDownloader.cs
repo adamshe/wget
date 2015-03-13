@@ -16,13 +16,11 @@ namespace NB.Core.Web.DownloadClient
     {
         static Lazy<HttpClient> _httpClient = new Lazy<HttpClient>(() => 
         {
-            var handler = new HttpClientHandler();
-            if (handler.SupportsAutomaticDecompression)
+            var client = new HttpClient(new WebRequestHandler() //HttpClientHandler
             {
-                handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            }
-
-            var client = new HttpClient(handler);
+                AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+                AllowAutoRedirect = true
+            }); 
             return client;
         });
         string _fileName = string.Empty;
@@ -102,6 +100,7 @@ namespace NB.Core.Web.DownloadClient
         {
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             var response = await _httpClient.Value.SendAsync(request);
+            var status = response.StatusCode;
             response.EnsureSuccessStatusCode();
             var contentString = await response.Content.ReadAsStringAsync();
 
@@ -219,27 +218,39 @@ namespace NB.Core.Web.DownloadClient
         #endregion
 
         #region IPostDownload
-        
-        public async Task<T> PostDownload(Uri url, Dictionary<string, string> data)
+       
+
+        public async Task<T> PostDownload(Dictionary<string, string> data)
         {
+            string url = _setting.GetUrlInternal();
             string contentStr = await PostDownloadInternal(url, data);
-            T obj = ConvertResult(contentStr, "");
+            T obj = ConvertResult(contentStr, _setting.Ticker);
             return obj;
         }
 
-        public async Task<FileInfo> PostDownloadFile(Uri url, Dictionary<string, string> data, string fileName)
+        public async Task<T> PostDownload(string url, Dictionary<string, string> data)
         {
+            var ticker = _setting.GetTickerFromUrl(url);
+            string contentStr = await PostDownloadInternal(url, data);
+            T obj = ConvertResult(contentStr, ticker);
+            return obj;
+        }
+
+        public async Task<FileInfo> PostDownloadFile(string url, Dictionary<string, string> data, string fileName)
+        {
+            Uri realurl = new Uri(url);
             var postData = new FormUrlEncodedContent(data);
-            var response = await _httpClient.Value.PostAsync(url, postData);
+            var response = await _httpClient.Value.PostAsync(realurl, postData);
             response.EnsureSuccessStatusCode();
             await response.Content.ReadAsFileAsync(fileName, true);
             return new FileInfo(fileName);
         }
 
-        private async Task<string> PostDownloadInternal (Uri url, Dictionary<string, string> data )
+        private async Task<string> PostDownloadInternal (string url, Dictionary<string, string> data )
         {
+            Uri realurl = new Uri(url);
             var postData = new FormUrlEncodedContent(data);
-            var response = await _httpClient.Value.PostAsync(url, postData);
+            var response = await _httpClient.Value.PostAsync(realurl, postData);
             response.EnsureSuccessStatusCode();
             string contentStr = await response.Content.ReadAsStringAsync();
             return contentStr;

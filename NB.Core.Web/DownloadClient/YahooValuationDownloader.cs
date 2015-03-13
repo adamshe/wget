@@ -35,7 +35,7 @@ namespace NB.Core.Web.DownloadClient
                 string startPattern = "<table";
                 string endPattern = "</table>";
                 int startIndex = normalizeContent.IndexOfOccurence(startPattern, 5);
-                int endIndex = normalizeContent.IndexOf("</table>", startIndex);
+                int endIndex = normalizeContent.IndexOf(endPattern, startIndex);
                 normalizeContent = normalizeContent.Substring(startIndex, endIndex - startIndex + endPattern.Length);
                 var tempnormalizeContent = normalizeContent.Replace("\r\n", " ").Replace("\t", " ").Replace("\n"," ");
                 normalizeContent = MyHelper.FixAttributes(tempnormalizeContent);
@@ -56,7 +56,7 @@ namespace NB.Core.Web.DownloadClient
             float tempVal;
             XPathAttribute xpath;
             object value;
-            XParseElement targetNode;
+            XParseElement targetNode, description;
             ValuationDataPoint data;
             string extractVal;
             if (resultNode != null)
@@ -66,31 +66,38 @@ namespace NB.Core.Web.DownloadClient
                     if (row.Name.LocalName == "tr")
                     {
                         rowNum++;
-                        if (rowNum > 1) // skip row header
+                        if (rowNum > 1 && rowNum <= 3) // skip row header
                         {
-                            var description = XPath.GetElement("/td[1]/font[1]/b", row);
-                            if (description.Value.Contains("Sector"))
+                            description = XPath.GetElement("/td[1]/font[1]/b", row);
+                            if (description != null)
                             {
-                               // var target = XPath.GetElement("/td[1]/font[2]/a", node);
-                                data = new ValuationDataPoint();
-                                data.Context = ContextType.Sector;
-                                FillDataPoint(data, row);
-                                aggregate.Sector = data;
-                            }
-                            else if (description.Value.Contains("Industry"))
-                            {
-                                data = new ValuationDataPoint();
-                                data.Context = ContextType.Industry;
-                                FillDataPoint(data, row);
-                                aggregate.Industry = data;
-                            }
-                            else if(description.Value.Contains(ticker))
+                                if (description.Value.Contains("Sector"))
+                                {
+                                    data = new ValuationDataPoint();
+                                    data.Context = ContextType.Sector;
+                                    FillDataPoint(data, row);
+                                    aggregate.Sector = data;
+                                }
+                                else if (description.Value.Contains("Industry"))
+                                {
+                                    data = new ValuationDataPoint();
+                                    data.Context = ContextType.Industry;
+                                    FillDataPoint(data, row);
+                                    aggregate.Industry = data;
+                                }
+                            }                            
+                        }
+                        else if (rowNum > 3)
+                        {                            
+                            description = XPath.GetElement("/td[1]/font/a[2]", row);
+                            if (description != null && description.Value == ticker)
                             {
                                 data = new ValuationDataPoint();
                                 data.Context = ContextType.Equity;
                                 FillDataPoint(data, row);
                                 aggregate.Self = data;
-                            }
+                                break;
+                            }                            
                         }
                     }
                 }
@@ -101,12 +108,12 @@ namespace NB.Core.Web.DownloadClient
         {
             var xpath = property.GetCustomAttributes<XPathAttribute>(false);//.Where(attr => attr.Name==attributeName).FirstOrDefault();
             var count = xpath.Count();
-            if (count > 1)
-                return xpath.Where(attr => attr.Name==attributeName).FirstOrDefault();
-            else if (count==1)
+            if (count==1)
                 return xpath.FirstOrDefault();
+            else if (count > 1)
+                return xpath.Where(attr => attr.Name==attributeName).FirstOrDefault();
             else
-            return null;
+                return null;
         }
 
         private static void FillDataPoint(ValuationDataPoint data, XParseElement node)
@@ -128,21 +135,10 @@ namespace NB.Core.Web.DownloadClient
                     temp = targetNode.Attribute(new XParseName(xpath.Source)).Value;
                 else
                     temp = targetNode.Value;
-                //switch (data.Context)
-                //{
-                //    case ContextType.Equity:
-                //        temp = targetNode.Value;
-                //        break;
-                //    case ContextType.Industry:
-                //        temp = targetNode.Value;
-                //        break;
-                //    case ContextType.Sector:
-                //        temp = targetNode.Attribute(new XParseName("href")).Value;
-                //        break;
-                //    default:
-                //        temp = targetNode.Value;
-                //        break;
-                //}
+
+                if (temp == "NA")
+                    continue;
+
                 extractVal = (xpath.RegexExpression != string.Empty) ?
                     MyHelper.ExtractPattern(temp, xpath.RegexExpression).Replace("\r\n", " ") :
                     temp;

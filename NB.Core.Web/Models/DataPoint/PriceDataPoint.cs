@@ -8,7 +8,15 @@ namespace NB.Core.Web.Models
 {
     public class PriceDataPoint
     {
-        public string Timestamp { get; set; }
+        //public static string TimestampBase { get; set; }
+
+        //public static int Interval { get; set; }
+
+        //public static int  Offset { get; set; }
+
+        //public string Timestamp { get; set; }
+
+        public DateTime Timestamp { get; set; }
 
         public double Open { get; set; }
 

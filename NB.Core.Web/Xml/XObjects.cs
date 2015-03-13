@@ -56,7 +56,7 @@ namespace NB.Core.Web.Xml
         public string NamespaceName { get; set; }
 
         public XParseName(string localName)
-        {
+        {            
             this.NamespaceName = string.Empty;
             this.LocalName = localName;
         }
@@ -64,6 +64,16 @@ namespace NB.Core.Web.Xml
         {
             this.NamespaceName = nameSpaceName;
             this.LocalName = localName;
+        }
+
+        public static implicit operator string(XParseName name)
+        {
+            return name.LocalName;
+        }
+
+        public static implicit operator XParseName(string name)
+        {
+            return new XParseName(name);
         }
 
         public static XParseName Get(string name)

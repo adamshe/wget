@@ -20,12 +20,19 @@ using System.Web.Script.Serialization;
 using NB.Core.Web.DataAccess.Repository;
 using System.Xml.Serialization;
 using System.Xml.Linq;
+using System.ServiceModel.Syndication;
+using System.Xml;
 
 namespace NB.Core.Web.UnitTest
 {
     [TestClass]
     public class DownloaderTest
     {//^TNX,TQQQ";/*
+        string[] friendTmus = { "7184042681", "7186668495" };
+        string[] friendAtt = { "8483912608" }; //9172079948
+
+        string[] friendsEmail = { "adamshe@gmail.com" };//"laofengs@gmail.com", 
+
         string tickers = @"AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
             FB,LNKD,TWTR,JD,JMEI,DATA,NOW,GILD,SPLK,TSO,
             LNG,EOG,APC,GPRO,NUAN,RCL,MCO,DFS,AXP,MA,V,GS,BAC,JPM,
@@ -68,7 +75,8 @@ namespace NB.Core.Web.UnitTest
         [TestMethod]
         public async Task GoogleIntradyCsvDownloaderTest()
         {
-            DateTime now = MyHelper.DateTimeFromUnixTimestamp(1425047460, 60, -300);
+            //1425907800
+            DateTime now = MyHelper.DateTimeFromUnixTimestamp(1424874600, -300);
             Debug.WriteLine(now.ToString("MM-dd-yyyy hh:mm:ss"));
 
             var setting = new GoogleIntradayCsvSetting("CSCO");
@@ -76,11 +84,10 @@ namespace NB.Core.Web.UnitTest
             var url = setting.GetUrl();
             Debug.WriteLine(url);
             var data = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
-            var datas = await downloader.BatchDownloadObjectsStreamTaskAsync(setting.GetUrls("AAPL,YHOO,MSFT,GOOGL")).ConfigureAwait(false);
-            //BatchDownloadObjectsStreamTaskAsync //BatchDownloadObjectsTaskAsync //Stream
-            Debug.WriteLine(data.ToString());
-            foreach (var data1 in datas)
-                Debug.WriteLine(data1.ToString());
+            foreach (var data1 in data)
+            {
+                PrintProperties(data1, 0);
+            }
 
         }
 
@@ -225,6 +232,51 @@ namespace NB.Core.Web.UnitTest
         }
 
         [TestMethod]
+        public async Task GetNasdaqHoldingDownloadTest()
+        {
+            var setting = new NasdaqHoldingSetting("SGEN");
+            var downloader = new NasdaqHoldingDownloader(setting);
+            var result = await downloader.PostDownload( 
+                new Dictionary<string,string>{{"Command","marketvalue" }, {"sortorder", "1"}, {"page","1"}});
+         //   var result = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
+         //   var result2 = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
+            PrintProperties(result, 0);
+         //   PrintProperties(result2, 0);
+        }
+
+        public static SyndicationFeed AtomFeed(string uri)
+        {
+            if (!string.IsNullOrEmpty(uri))
+            {
+                var ff = new Atom10FeedFormatter(); // Rss20FeedFormatter for Atom you can use Atom10FeedFormatter()
+                var xr = XmlReader.Create(uri);
+                ff.ReadFrom(xr);
+                return ff.Feed;
+            }
+            return null;
+        }
+
+
+        [TestMethod]
+        public async Task GetSecDownloadTest()
+        {
+            string bakerBrotherRSS = "http://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001263508&type=4%25&dateb=&owner=include&start=0&count=100&output=atom";
+            var setting = new SecEdgarSetting();
+            var downloader = new SecEdgarDownloader(setting);            
+
+                 var feed = AtomFeed(bakerBrotherRSS);
+                 var sb = new StringBuilder(200);
+            foreach (var link in feed.Items)
+            {
+                var linkUrl = link.Links[0].Uri.AbsoluteUri;
+                var result = await downloader.DownloadObjectTaskAsync(linkUrl).ConfigureAwait(false);
+                sb.AppendLine(result.ToString());
+            }
+
+            MyHelper.SendEmail("Institution Baker Brother accumulation Action ", sb.ToString(), friendsEmail);
+        }
+
+        [TestMethod]
         public async Task CalculateFairValue()
         {
             double inflation = 0.02; //todo: get from yahoo quote
@@ -274,31 +326,25 @@ namespace NB.Core.Web.UnitTest
 
         }
 
-      //  [TestMethod]
-        public void SendSMS ()
+        
+        public void SendSMS (string msg)
         {
-            long[] friendTmus = { 7184042681,7186668495  };
-            long[] friendAtt = { 9172079948,8483912608 };
-            var msg = @"亲爱的朋友, 您将自动成为Adam开发的交易系统的首批用户通知子系统
+          
+        /*    var msg = @"亲爱的朋友, 您将自动成为Adam开发的交易系统的首批用户通知子系统
                  该系统现在主要研究是分析明牌，从重要网站数据采集，不犯方向性错误。主要关注四种策略，好骑师，灰马，BUYOUT和庄家自救，4种占齐胜算是95%以上，
                  系统主要是避免人性的弱点和心情的起伏，不会犯低级错误，
                  后面阶段将用NEURAL NETWORK建立预测系统，定价，趋势的提前预见，ORDER MANAGEMENT，机会寻找，胜算估计，自动交易。
-                 BACKEND可能会用WEB API， 前台可能会是SPA";
-            foreach (var phone in friendTmus)
-            {
+                 BACKEND可能会用WEB API， 前台可能会是SPA";*/
+          
              //   MyHelper.SendTextMessage("慢点开车", "想", 7184042681, CarrierGateWay.TMOBILE);
              //   MyHelper.SendTextMessage("Test", "Hello, 你受到这封信，是因为你认识Adam，开发一个交易系统的通知子系统", 9172079948, CarrierGateWay.ATT);
-                MyHelper.SendTextMessage("订阅服务 : ",
-                msg, phone, CarrierGateWay.TMOBILE);
-            }
+                MyHelper.SendTextMessage("订阅服务 : ",msg, CarrierGateWay.TMOBILE,friendTmus);
+          
 
-            foreach (var phone in friendAtt)
-            {
-                //   MyHelper.SendTextMessage("慢点开车", "想", 7184042681, CarrierGateWay.TMOBILE);
+           //   MyHelper.SendTextMessage("慢点开车", "想", 7184042681, CarrierGateWay.TMOBILE);
                 //   MyHelper.SendTextMessage("Test", "Hello, 你受到这封信，是因为你认识Adam，开发一个交易系统的通知子系统", 9172079948, CarrierGateWay.ATT);
-                MyHelper.SendTextMessage("订阅服务 : ", msg
-                    , phone, CarrierGateWay.ATT);
-            }
+                MyHelper.SendTextMessage("订阅服务 : ", msg, CarrierGateWay.ATT, friendAtt);
+           
         }
         
         [TestMethod]
@@ -470,8 +516,13 @@ namespace NB.Core.Web.UnitTest
                 object propValue = property.GetValue(obj, null);
                 if (property.PropertyType.Assembly == objType.Assembly)
                 {
-                    Console.WriteLine("{0}{1}:", indentString, property.Name);
-                    PrintProperties(propValue, indent + 2);
+                    if(property.PropertyType.IsEnum)
+                        Console.WriteLine("{0}{1}: {2}", indentString, property.Name, propValue);
+                    else
+                    {
+                        Console.WriteLine("{0}{1}:", indentString, property.Name);
+                        PrintProperties(propValue, indent + 2);
+                    }
                 }
                 else
                 {

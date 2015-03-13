@@ -31,11 +31,11 @@ namespace NB.Core.Web.DownloadClient
             headerLine = reader.ReadLine();
             headerLine = reader.ReadLine();
             headerLine = reader.ReadLine();
-            ((GoogleIntradayCsvSetting)Setting).TimezoneOffset = int.Parse(MyHelper.ExtractPattern(headerLine, @".*=(\d*)"));
+            PriceDataGoogleMapping.Interval = ((GoogleIntradayCsvSetting)Setting).IntervalInSeconds = int.Parse(MyHelper.ExtractPattern(headerLine, @".*=(\d*)"));
             headerLine = reader.ReadLine();
             headerLine = reader.ReadLine();
             headerLine = reader.ReadLine();
-            
+            PriceDataGoogleMapping.TimeZoneOffset = ((GoogleIntradayCsvSetting)Setting).TimezoneOffset = int.Parse(MyHelper.ExtractPattern(headerLine, @".*=(-?\d*)"));
             /*
                 * EXCHANGE%3DNYSE
                 MARKET_OPEN_MINUTE=570
@@ -45,18 +45,30 @@ namespace NB.Core.Web.DownloadClient
                 DATA=
                 TIMEZONE_OFFSET=-300
                 */
-               
+
             using (var csvReader = new CsvReader(reader))
             {
                 csvReader.Configuration.HasHeaderRecord = false;
                 csvReader.Configuration.RegisterClassMap<PriceDataGoogleMapping>();
                 while (csvReader.Read())
                 {
-                    var data = csvReader.GetRecord<PriceDataPoint>();
-                    list.Add(data);
+                    if (csvReader[0].Contains("TIMEZONE_OFFSET"))
+                    {
+                        PriceDataGoogleMapping.TimeZoneOffset = int.Parse(MyHelper.ExtractPattern(headerLine, @".*=(-?\d*)"));
+                        continue;
+                    }
+                    try
+                    {
+                        var data = csvReader.GetRecord<PriceDataPoint>();
+                        list.Add(data);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(ex.InnerException);
+                    }
                 }
             }
-            
             return list.ToArray<PriceDataPoint>();
         }
 

@@ -32,7 +32,7 @@ namespace NB.Core.Web.Interfaces
 
     public interface IPostDownLoad<T>
     {
-        Task<T> PostDownload(Uri url, Dictionary<string, string> data);
-        Task<FileInfo> PostDownloadFile(Uri url, Dictionary<string, string> data, string fileName);
+        Task<T> PostDownload(string url, Dictionary<string, string> data);
+        Task<FileInfo> PostDownloadFile(string url, Dictionary<string, string> data, string fileName);
     }
 }

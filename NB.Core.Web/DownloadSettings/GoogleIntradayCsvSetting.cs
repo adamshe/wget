@@ -32,11 +32,11 @@ namespace NB.Core.Web.DownloadSettings
 		public GoogleIntradayCsvSetting(string ticker = "SPY")
 		{
 			Ticker = ticker;
-			PeriodInSeconds = 180;
+			IntervalInSeconds = 180;
 			TimezoneOffset = -300;
 		}
 
-		public int PeriodInSeconds { get; set; }
+		public int IntervalInSeconds { get; set; }
 		public int TimezoneOffset { get; set; }
 		
 		protected sealed override string UrlStr
@@ -76,7 +76,7 @@ namespace NB.Core.Web.DownloadSettings
 
 		public override string GetUrl(string ticker)
 		{
-			return string.Format(UrlStr, ticker, PeriodInSeconds);
+			return string.Format(UrlStr, ticker, IntervalInSeconds);
 		}
 	}
 }

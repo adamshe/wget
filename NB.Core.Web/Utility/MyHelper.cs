@@ -462,35 +462,50 @@ namespace NB.Core.Web.Utility
             }
         }
 
-        public static void SendTextMessage(string subject, string message, long telephoneNumer, CarrierGateWay carrier)
+        public static void SendEmail(string subject, string message, params string[] receipients)
+        {
+            var credential = new NetworkCredential("adamcheng888@gmail.com", "googWealthy9!");
+            SendEmail(credential, subject, message, receipients);
+        }
+
+        public static void SendEmail(NetworkCredential credential, string subject, string message, params string[] recipents)
+        {
+            foreach (var recipent in recipents)
+            {
+                using (MailMessage textMessage = new MailMessage(credential.UserName, recipent, subject, message))
+                {
+                    using (SmtpClient textMessageClient = new SmtpClient("smtp.gmail.com", 587))
+                    {
+                        //  var token = new CancellationToken();
+                        textMessageClient.UseDefaultCredentials = false;
+                        textMessageClient.EnableSsl = true;
+                        textMessageClient.Credentials = credential;
+                        textMessageClient.Send(textMessage);//, token);
+                    }
+                }
+            }
+        }
+        public static void SendTextMessage(string subject, string message, CarrierGateWay carrier, params string[] telephoneNumers)
         {
             //http://martinfitzpatrick.name/list-of-email-to-sms-gateways/
             // login details for gmail acct.
-            const string sender = "adamshe@gmail.com";
-            const string password = "googwealthy9!!";
+            const string sender = "adamcheng888@gmail.com";
+            const string password = "googWealthy9!";
 
+            var credential = new NetworkCredential(sender, password);
             // find the carriers sms gateway for the recipent. txt.att.net is for AT&T customers.
             string carrierGateway = MyHelper.GetDescriptionFromEnumValue(carrier);
 
             // this is the recipents number @ carrierGateway that gmail use to deliver message.
-            string recipent = string.Concat(new object[]{
-            telephoneNumer,
+
+            var recipents = from recipient in telephoneNumers select string.Concat(new object[]{
+            recipient,
             '@',
             carrierGateway
             });
 
-            // form the text message and send
-            using (MailMessage textMessage = new MailMessage(sender, recipent, subject, message))
-            {
-                using (SmtpClient textMessageClient = new SmtpClient("smtp.gmail.com", 587))
-                {
-                  //  var token = new CancellationToken();
-                    textMessageClient.UseDefaultCredentials = false;
-                    textMessageClient.EnableSsl = true;
-                    textMessageClient.Credentials = new NetworkCredential(sender, password);
-                    textMessageClient.Send(textMessage);//, token);
-                }
-            }
+            SendEmail(credential, subject, message, recipents.ToArray());
+            
         }
 
         public static T GetAttributeValue<T> (Type t, Attribute attribute) where T: Attribute
@@ -554,13 +569,12 @@ namespace NB.Core.Web.Utility
             return reader;
         }
 
-        public static DateTime DateTimeFromUnixTimestamp(int unixTimestamp, int intervalInSecond, int timeOffset)
+        public static DateTime DateTimeFromUnixTimestamp(long unixTimestamp, int timeOffsetInMinutes)
         {
-            DateTime unixYear0 = new DateTime(1970, 1, 1);
-            long unixTimeStampInTicks = unixTimestamp * TimeSpan.TicksPerSecond + TimeSpan.TicksPerSecond * intervalInSecond * timeOffset;
-            DateTime dtUnix = new DateTime(unixYear0.Ticks + unixTimeStampInTicks);
-          
-            return dtUnix;
+            DateTime unixYear0 = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+            var dt = unixYear0.AddSeconds(unixTimestamp + 60 * timeOffsetInMinutes);
+            return dt;
         }
 
         public static long UnixTimestampFromDateTime(DateTime date)

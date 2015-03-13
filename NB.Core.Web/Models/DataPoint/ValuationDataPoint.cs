@@ -54,7 +54,8 @@ namespace NB.Core.Web.Models
         public ContextType Context { get; set; }
 
         [XPath("/td[1]/font[2]/a", Name = "Sector")]
-        [XPath("/td[1]/font[2]", Name = "Industry", RegexExpression = @"(\w+\s+\w+)\s+\(.*\)$")]        
+        [XPath("/td[1]/font[2]", Name = "Industry", RegexExpression = @"(\w+\s+\w+)\s+\(.*\)$")]
+        [XPath("/td[1]/font/a[1]", Name ="Equity")]
         public string Description { get; set; }
 
         [XPath("/td[2]/font")]

@@ -75,7 +75,7 @@ namespace NB.Core.Web.Models
         /// <remarks></remarks>
         public double AverageVolumeTenDaysInThousand { get; set; }
         /// <summary>
-        /// This is the number of shares of common stock currently outstanding—the number of shares issued minus the shares held in treasury. This field reflects all offerings and acquisitions for stock made after the end of the previous fiscal period.
+        /// This is the number of shares of common stock currently outstanding—the number of shares issued minus the shares held in treasury. This _institutionalOwnerShip reflects all offerings and acquisitions for stock made after the end of the previous fiscal period.
         /// </summary>
         /// <value></value>
         /// <returns></returns>
