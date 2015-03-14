@@ -10,7 +10,7 @@ using System;
 
 namespace NB.Core.Web.DownloadClient
 {
-    public class MorningStartValuationDownloader : BaseDownloader<MorningStartValuation>
+    public class MorningStartValuationDownloader : BaseDownloader<MorningStarValuation>
     {
 
         public MorningStartValuationDownloader(BaseSetting setting)
@@ -19,9 +19,9 @@ namespace NB.Core.Web.DownloadClient
 
         }
 
-        protected override MorningStartValuation ConvertResult(string content, string ticker = "")
+        protected override MorningStarValuation ConvertResult(string content, string ticker = "")
         {
-            var valuation = new MorningStartValuation(ticker);
+            var valuation = new MorningStarValuation(ticker);
 
             XParseElement resultNode;
             var mySetting = Setting as MorningStarValuationSetting;
@@ -39,7 +39,7 @@ namespace NB.Core.Web.DownloadClient
             return valuation;
         }
 
-        private static void ParseTable(MorningStartValuation currentValuation, XParseElement sourceNode, string mark, string xPath)
+        private static void ParseTable(MorningStarValuation currentValuation, XParseElement sourceNode, string mark, string xPath)
         {
             var resultNode = sourceNode;
             if (!(string.IsNullOrWhiteSpace(xPath) || string.IsNullOrEmpty(xPath)))

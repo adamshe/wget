@@ -5,14 +5,14 @@ using NB.Core.Web.Models.Metadata;
 namespace NB.Core.Web.Models
 {
 
-    public class StockDataPointAggregate
+    public class ValuationDataPointAggregate
     {
-        public StockDataPointAggregate(string ticker)
+        public ValuationDataPointAggregate(string ticker)
         {
             Ticker = ticker;
         }
 
-        public StockDataPointAggregate(ValuationDataPoint self, ValuationDataPoint sector, ValuationDataPoint industry)
+        public ValuationDataPointAggregate(ValuationDataPoint self, ValuationDataPoint sector, ValuationDataPoint industry)
         {
             Self = self;
             Sector = sector;

@@ -38,14 +38,14 @@ namespace NB.Core.Web.Models.DataPoint
         public void PopulatePoints (XDocument doc)
         {
             var list = new List<PositionChangeDataPoint>();
-            var element = from el in doc.Root.Descendants("nonDerivativeTransaction")
+            var element = from el in doc.Root.Descendants("Entry")
                              // where el.Descendants("transactionAmounts").First().Element("transactionAcquiredDisposedCode").Element("value").Value == "A"
                               select new PositionChangeDataPoint{ 
-                                     Date = DateTime.Parse(el.Descendants("transactionDate").First().Element("value").Value),
-                                     Qantity = ShareSign(el.Descendants("transactionAmounts").First().Element("transactionAcquiredDisposedCode").Element("value").Value) *
-                                     int.Parse(el.Descendants("transactionAmounts").First().Element("transactionShares").Element("value").Value), 
-                                     Price = float.Parse(el.Descendants("transactionAmounts").First().Element("transactionPricePerShare").Element("value").Value),
-                                     Ticker = el.Descendants("Ticker").First().Attribute("symbol").Value
+                                     Date = DateTime.Parse(el.Attribute("Date").Value),
+                                     Qantity = ShareSign(el.Attribute("AquiredDisposeCode").Value) *
+                                     int.Parse(el.Attribute("Share").Value),
+                                     Price = float.Parse(el.Attribute("Price").Value),
+                                     Ticker = doc.Root.Name.LocalName
                                      };
             list.AddRange(element);
             _item = list.ToArray();

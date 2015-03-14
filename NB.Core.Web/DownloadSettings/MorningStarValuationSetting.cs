@@ -23,9 +23,9 @@ namespace NB.Core.Web.DownloadSettings
 			get 
 			{
 				if (IsForwardValuation)
-					return "http://financials.morningstar.com/valuation/forward-valuation-list.action?&t=XNAS:AMZN&region=usa&culture=en-US";
+					return "http://financials.morningstar.com/valuation/forward-valuation-list.action?&t={0}&region=usa&culture=en-US";
 
-				return "http://financials.morningstar.com/valuation/current-valuation-list.action?&t=XNAS:{0}&region=usa&culture=en-US"; 
+				return "http://financials.morningstar.com/valuation/current-valuation-list.action?&t={0}&region=usa&culture=en-US"; 
 			}
 		}
 

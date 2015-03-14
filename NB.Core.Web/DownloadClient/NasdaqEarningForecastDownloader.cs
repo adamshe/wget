@@ -13,7 +13,7 @@ using System.Web;
 
 namespace NB.Core.Web.DownloadClient
 {
-    public class NasdaqEarningForecastDownloader : BaseDownloader<NasdaqEarningForecastResult>
+    public class NasdaqEarningForecastDownloader : BaseDownloader<NasdaqEarningForecastAggregate>
     {
         public NasdaqEarningForecastDownloader(BaseSetting setting) : base (setting)
         {
@@ -25,7 +25,7 @@ namespace NB.Core.Web.DownloadClient
         {
         }
 
-        protected sealed override NasdaqEarningForecastResult ConvertResult(string contentStr, string ticker = "")
+        protected sealed override NasdaqEarningForecastAggregate ConvertResult(string contentStr, string ticker = "")
         {
             List<NasdaqEarningForecastData> yearly = new List<NasdaqEarningForecastData>(10);
             List<NasdaqEarningForecastData> quarterly = new List<NasdaqEarningForecastData>(10);
@@ -49,7 +49,7 @@ namespace NB.Core.Web.DownloadClient
                 resultNode = XPath.GetElement("//table", quarter);
                 ParseTable(quarterly, resultNode, symbol, "");
 
-                return new NasdaqEarningForecastResult(yearly.ToArray(), quarterly.ToArray(), ticker);
+                return new NasdaqEarningForecastAggregate(yearly.ToArray(), quarterly.ToArray(), ticker);
             }
             return null;
         }

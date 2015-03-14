@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using MicroOrm.Pocos.SqlGenerator.Attributes;
 namespace NB.Core.Web.Models
 {
-    public class NasdaqEarningForecastResult
+    public class NasdaqEarningForecastAggregate
     {
         NasdaqEarningForecastData[] m_yearlyEarningForecasts;
 
@@ -24,7 +24,7 @@ namespace NB.Core.Web.Models
             set { m_quarterlyEarningForecasts = value; }
         }
 
-        public NasdaqEarningForecastResult(NasdaqEarningForecastData[] yearly, NasdaqEarningForecastData[] quarterly, string ticker)
+        public NasdaqEarningForecastAggregate(NasdaqEarningForecastData[] yearly, NasdaqEarningForecastData[] quarterly, string ticker)
         {
             m_yearlyEarningForecasts = yearly;
             m_quarterlyEarningForecasts = quarterly;

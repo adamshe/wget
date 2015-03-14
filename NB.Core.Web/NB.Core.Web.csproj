@@ -123,7 +123,7 @@
     <Compile Include="Models\CurrencyInfo.cs" />
     <Compile Include="Models\DaylightSavingTime.cs" />
     <Compile Include="Models\DataPoint\QuotesBaseData.cs" />
-    <Compile Include="Models\MorningStartValuation.cs" />
+    <Compile Include="Models\MorningStarValuation.cs" />
     <Compile Include="Models\DataPoint\YahooQuotesData.cs" />
     <Compile Include="Models\TickerEarningDate.cs" />
     <Compile Include="Models\YCurrencyID.cs" />

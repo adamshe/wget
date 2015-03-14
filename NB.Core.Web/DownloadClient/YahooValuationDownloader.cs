@@ -16,7 +16,7 @@ using System.Reflection;
 
 namespace NB.Core.Web.DownloadClient
 {
-    public class YahooValuationDownloader : BaseDownloader<StockDataPointAggregate>
+    public class YahooValuationDownloader : BaseDownloader<ValuationDataPointAggregate>
     {
         private const string _baseUrl = "http://biz.yahoo.com/p/";
         public YahooValuationDownloader(BaseSetting setting): base(setting)
@@ -24,9 +24,9 @@ namespace NB.Core.Web.DownloadClient
 
         }
 
-        protected override StockDataPointAggregate ConvertResult(string contentStr, string ticker = "")
+        protected override ValuationDataPointAggregate ConvertResult(string contentStr, string ticker = "")
         {
-            var aggregate = new StockDataPointAggregate(ticker);
+            var aggregate = new ValuationDataPointAggregate(ticker);
 
             if (!string.IsNullOrEmpty(contentStr))
             {
@@ -47,7 +47,7 @@ namespace NB.Core.Web.DownloadClient
             return null;
         }
 
-        private void ParseTable(StockDataPointAggregate aggregate, XParseElement sourceNode, string ticker, string xPath)
+        private void ParseTable(ValuationDataPointAggregate aggregate, XParseElement sourceNode, string ticker, string xPath)
         {
             var resultNode = sourceNode;
             if (!(string.IsNullOrWhiteSpace(xPath) || string.IsNullOrEmpty(xPath)))

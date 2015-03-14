@@ -7,9 +7,27 @@ using System.Threading.Tasks;
 
 namespace NB.Core.Web.Models
 {
-    public class MorningStartValuation
+    public class MoringStartValuationAggregate
     {
-        public MorningStartValuation(string ticker)
+        public MoringStartValuationAggregate()
+        {
+
+        }
+
+        public MoringStartValuationAggregate(string ticker)
+        {
+            Ticker = ticker;
+        }
+        public string Ticker { get; set; }
+
+        public MorningStarValuation CurrentValuation { get; set; }
+
+        public MorningStarValuation ForwardValuation { get; set; }
+    }
+
+    public class MorningStarValuation
+    {
+        public MorningStarValuation(string ticker)
         {
             Ticker = ticker;
         }

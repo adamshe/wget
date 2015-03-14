@@ -1,26 +1,24 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NB.Core.Valuation;
+using NB.Core.Web.DataAccess.Repository;
 using NB.Core.Web.DownloadClient;
 using NB.Core.Web.DownloadSettings;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.IO;
 using NB.Core.Web.Enums;
-using NB.Core.Web.Utility;
-using System.Linq;
 using NB.Core.Web.Extensions;
-using System.Collections.Concurrent;
 using NB.Core.Web.Models;
-using NB.Core.Valuation;
+using NB.Core.Web.Utility;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Web.Script.Serialization;
-using NB.Core.Web.DataAccess.Repository;
-using System.Xml.Serialization;
-using System.Xml.Linq;
 using System.ServiceModel.Syndication;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 using System.Xml;
 
 namespace NB.Core.Web.UnitTest
@@ -32,7 +30,7 @@ namespace NB.Core.Web.UnitTest
         string[] friendAtt = { "8483912608" }; //9172079948
 
         string[] friendsEmail = { "adamshe@gmail.com" };//"laofengs@gmail.com", 
-
+        //LNG,
         string tickers = @"AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
             FB,LNKD,TWTR,JD,JMEI,DATA,NOW,GILD,SPLK,TSO,
             LNG,EOG,APC,GPRO,NUAN,RCL,MCO,DFS,AXP,MA,V,GS,BAC,JPM,
@@ -273,7 +271,7 @@ namespace NB.Core.Web.UnitTest
                 sb.AppendLine(result.ToString());
             }
 
-            MyHelper.SendEmail("Institution Baker Brother accumulation Action ", sb.ToString(), friendsEmail);
+            //MyHelper.SendEmail("Institution Baker Brother accumulation Action ", sb.ToString(), friendsEmail);
         }
 
         [TestMethod]
@@ -436,7 +434,7 @@ namespace NB.Core.Web.UnitTest
         [TestMethod]
         public async Task GetMorningStarValuationHistoryMetrics()
         {
-            var setting = new MorningStarValuationSetting("AMZN");
+            var setting = new MorningStarValuationSetting("RCL");
             var downloader = new MorningStartValuationDownloader(setting);
             var curVal = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
 
@@ -492,7 +490,7 @@ namespace NB.Core.Web.UnitTest
         }
 
         [TestMethod]
-        public async Task ValuationPointTest()
+        public async Task YahooValuationPointTest()
         {
             var setting = new YahooValuationSetting();
             var downloader = new YahooValuationDownloader(setting);
@@ -501,6 +499,17 @@ namespace NB.Core.Web.UnitTest
             PrintProperties(result.Industry, 0);
             PrintProperties(result.Self, 0);
 
+        }
+
+        [TestMethod]
+        public void StockContextTest()
+        {
+            var symbles = MyHelper.GetStringToken(tickers, new string[] { ";", "," });////new string[] {"AAPL", "CSCO", "ACAD", "SGEN", "GOOGL"};
+            var context = new StockContext(symbles);
+
+            var sector = context.SectorByTicker("AAPL");
+            var industry = context.IndustryByTicker("AAPL");
+            var equity = context.EquityByTicker("AAPL");
         }
 
         public void PrintProperties(object obj, int indent)
