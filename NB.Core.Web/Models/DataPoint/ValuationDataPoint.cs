@@ -44,6 +44,9 @@ namespace NB.Core.Web.Models
         public ValuationDataPoint[] Industries { get; set; }
     }
 
+    /// <summary cref="YahooValuationSetting">
+    /// get valuation from Yahoo web site
+    /// </summary>
     public class ValuationDataPoint
     {
         [XPath("/td[1]/font[2]/a", Name = "Sector", Source="href", RegexExpression = @"(\d*)\w*\.html$")]

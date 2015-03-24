@@ -33,6 +33,9 @@
     <Reference Include="CsvHelper">
       <HintPath>..\packages\CsvHelper.2.11.0\lib\net40-client\CsvHelper.dll</HintPath>
     </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="MicroOrm.Pocos.SqlGenerator">
       <HintPath>..\packages\MicroOrm.Pocos.SqlGenerator.1.0.0.2\lib\net45\MicroOrm.Pocos.SqlGenerator.dll</HintPath>
     </Reference>
@@ -53,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\Yahoo.cs" />
+    <Compile Include="DownloadClient\MorningPerformanceDownloader.cs" />
     <Compile Include="DownloadClient\MorningStartValuationDownloader.cs" />
     <Compile Include="DownloadClient\NasdaqEarningHistoryDownloader.cs" />
     <Compile Include="DownloadClient\GoogleIntradayCsvDownloader.cs" />
@@ -80,6 +84,8 @@
     <Compile Include="Enums\ValuationType.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="Extensions\DateTimeExtension.cs" />
+    <Compile Include="Facade\QueryFacade.cs" />
+    <Compile Include="Interfaces\IValuationQuery.cs" />
     <Compile Include="Models\AnalystTarget.cs" />
     <Compile Include="Models\CompanyFinancialHighlights.cs" />
     <Compile Include="Models\Context\StockContext.cs" />

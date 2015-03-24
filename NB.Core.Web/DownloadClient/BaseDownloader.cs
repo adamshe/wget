@@ -101,10 +101,15 @@ namespace NB.Core.Web.DownloadClient
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             var response = await _httpClient.Value.SendAsync(request);
             var status = response.StatusCode;
-            response.EnsureSuccessStatusCode();
-            var contentString = await response.Content.ReadAsStringAsync();
 
-            return contentString;
+            if (response.IsSuccessStatusCode)
+            {
+                response.EnsureSuccessStatusCode();
+                var contentString = await response.Content.ReadAsStringAsync();
+
+                return contentString;
+            }
+            return null;
         }
 
         public async Task<StreamReader> DownloadStreamTaskAync(string url)

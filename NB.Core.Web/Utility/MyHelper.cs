@@ -43,6 +43,7 @@ using System.Linq;
 using System.Threading;
 using System.Xml.Serialization;
 using System.Xml.Linq;
+using NB.Core.Web.Extensions;
 namespace NB.Core.Web.Utility
 {
     public static class MyHelper
@@ -241,6 +242,15 @@ namespace NB.Core.Web.Utility
             }
         }
 
+        public static XParseDocument GetResultTable(string content, int nthTable, string tableStart, string tableEnd = "</table>")
+        {
+            var startIndex = content.IndexOfOccurence(tableStart, nthTable);
+            var endIndex = content.IndexOf(tableEnd, startIndex);
+
+            var targetTableStr = content.Substring(startIndex, endIndex + tableEnd.Length);
+            XParseDocument doc = MyHelper.ParseXmlDocument(targetTableStr);
+            return doc;
+        }
         public static XParseElement GetResultTable (string content, string matchPattern, string targetXpath)
         {
             var match = Regex.Matches(content, matchPattern, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);

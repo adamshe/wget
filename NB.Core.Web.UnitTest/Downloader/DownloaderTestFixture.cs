@@ -143,7 +143,7 @@ namespace NB.Core.Web.UnitTest
                 QuoteProperty.PercentChangeFromTwoHundreddayMovingAverage            
             };
 
-            setting.IDs = MyHelper.GetStringToken(tickers, new string[] { ";", "," });
+            setting.IDs = new string[] { "^TNX" };//MyHelper.GetStringToken(tickers, new string[] { ";", "," });
             var downloader = new YahooQuotesDownloader(setting);
             var result = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
             
@@ -232,7 +232,7 @@ namespace NB.Core.Web.UnitTest
         [TestMethod]
         public async Task GetNasdaqHoldingDownloadTest()
         {
-            var setting = new NasdaqHoldingSetting("SGEN");
+            var setting = new NasdaqHoldingSetting("SLXP");
             var downloader = new NasdaqHoldingDownloader(setting);
             var result = await downloader.PostDownload( 
                 new Dictionary<string,string>{{"Command","marketvalue" }, {"sortorder", "1"}, {"page","1"}});
@@ -502,6 +502,17 @@ namespace NB.Core.Web.UnitTest
         }
 
         [TestMethod]
+        public async Task MorningStarPerformanceTest()
+        {
+            var setting = new MorningStarPerformanceSetting("MSFT");
+            var downloader = new MorningStartPerformanceDownloader(setting);
+            var result = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
+            PrintProperties(result.StockPerformance, 0);
+            PrintProperties(result.Industryformance, 0);
+            PrintProperties(result.SP500formance, 0);
+        }
+
+        [TestMethod]
         public void StockContextTest()
         {
             var symbles = MyHelper.GetStringToken(tickers, new string[] { ";", "," });////new string[] {"AAPL", "CSCO", "ACAD", "SGEN", "GOOGL"};
@@ -510,6 +521,12 @@ namespace NB.Core.Web.UnitTest
             var sector = context.SectorByTicker("AAPL");
             var industry = context.IndustryByTicker("AAPL");
             var equity = context.EquityByTicker("AAPL");
+
+            var fiveAvgPE = context.CurrentMorningStarValuationMetric.FiveYearsAvgPE;
+            var currentPE = context.CurrentMorningStarValuationMetric.CurrentPE;
+            var forwardPE = context.ForwardMorningStarValuationMetric.ForwardPE;
+            var growth = currentPE / forwardPE - 1;
+
         }
 
         public void PrintProperties(object obj, int indent)

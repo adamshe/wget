@@ -122,7 +122,7 @@ namespace NB.Core.Web.Models
         {
             var setting = new YahooValuationSetting();
             var downloader = new YahooValuationDownloader(setting);
-            _yahooValDataPoint = await downloader.DownloadObjectStreamTaskAsync(setting.GetUrl(ticker)).ConfigureAwait(false);
+            _yahooValDataPoint = await downloader.DownloadObjectTaskAsync(setting.GetUrl(ticker)).ConfigureAwait(false);
             _yahoo.Add(ticker, _yahooValDataPoint);
         }
 
@@ -130,7 +130,7 @@ namespace NB.Core.Web.Models
         {
             var setting = new NasdaqEarningForecastSetting(ticker);
             var downloader = new NasdaqEarningForecastDownloader(setting);
-             _nasdaqEarningForecast = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
+            _nasdaqEarningForecast = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
              _nasdaq.Add(ticker, _nasdaqEarningForecast);        
         }
 

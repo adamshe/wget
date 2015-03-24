@@ -19,7 +19,11 @@ namespace NB.Core.Web.DownloadSettings
 
 		protected sealed override string UrlStr
 		{
-			get { return "http://http://performance.morningstar.com/funds/etf/total-returns.action?t={0}"; }
+			//"http://performance.morningstar.com/funds/etf/total-returns.action?t={0}"
+			get 
+			{ 
+				return "http://performance.morningstar.com/stock/performance-return.action?t={0}&region=usa&culture=en-US"; 
+			}
 		}
 
 		public override string GetFileName(string ticker)
