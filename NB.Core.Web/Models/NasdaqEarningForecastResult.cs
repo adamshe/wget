@@ -74,7 +74,7 @@ namespace NB.Core.Web.Models
             }
         }
 
-        private int Years { get { return m_yearlyEarningForecasts.Length; } }
+        public int Years { get { return m_yearlyEarningForecasts.Length; } }
 
         private double GetGrowthRate (NasdaqEarningForecastData[] data)
         {

@@ -19,10 +19,13 @@ namespace NB.Core.Web.DownloadSettings
 
 		protected sealed override string UrlStr
 		{
+			//http://performance.morningstar.com/stock/performance-return.action?t={0}&region=usa&culture=en-US
 			//"http://performance.morningstar.com/funds/etf/total-returns.action?t={0}"
-			get 
-			{ 
-				return "http://performance.morningstar.com/stock/performance-return.action?t={0}&region=usa&culture=en-US"; 
+			get
+			{
+				return "http://performance.morningstar.com/Performance/stock/trailing-total-returns.action?&t={0}&region=usa&culture=en-US&cur=&ops=clear&s=0P00001MK8&ndec=2&ep=true&align=d&annlz=true";
+					// this is for years y=?
+					//"http://performance.morningstar.com/Performance/stock/performance-history-1.action?&t={0}&region=usa&culture=en-US&cur=&ops=clear&s=0P00001MK8&ndec=2&ep=true&align=m&y=10&type=growth"; 
 			}
 		}
 
@@ -38,7 +41,7 @@ namespace NB.Core.Web.DownloadSettings
 
 		public override string GetTickerFromUrl(string url)
 		{
-			var ticker = MyHelper.ExtractPattern(url, @".*\?t=(?<ticker>\w*)");
+			var ticker = MyHelper.ExtractPattern(url, @".*\?&t=(?<ticker>\w*)");
 			return ticker;
 		}
 

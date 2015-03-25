@@ -162,6 +162,16 @@ namespace NB.Core.Web.UnitTest
                     ));
             }
         }
+        [TestMethod]
+        public async Task CpiDownloaderTest ()
+        {
+            var setting = new CpiDataSetting();
+            var downloader = new CpiDataDownloader(setting);
+            var result = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
+
+            foreach (var item in result.Items)
+                PrintProperties(item, 0);
+        }
 
         [TestMethod]
         public async Task TrefisDownloaderTest ()
@@ -277,7 +287,10 @@ namespace NB.Core.Web.UnitTest
         [TestMethod]
         public async Task CalculateFairValue()
         {
-            double inflation = 0.02; //todo: get from yahoo quote
+          //  var tenYearsBondYield = await DownloadHelper.GetQuote(new string[] { "^TNX" }, QuoteProperty.LastTradePriceOnly, QuoteProperty.ChangeInPercent);
+          //  var currentPrice = DownloadHelper.GetQuote(new string[] { ticker }, QuoteProperty.LastTradePriceOnly, QuoteProperty.ChangeInPercent);
+
+            double inflation = await DownloadHelper.GetCpiData(); //todo: get from yahoo quote
             double fixincomeReturnRate = 0.0795; //todo: get from yahoo quote
             var setting = new CompanyStatisticsSetting("CSCO");
             var dl = new YahooCompanyStatisticsDownloader(setting);
@@ -308,7 +321,7 @@ namespace NB.Core.Web.UnitTest
                 var growthRate = highlight.QuarterlyRevenueGrowthPercent;//.QuaterlyEarningsGrowthPercent /100.0;
                 //var outStandingShare = vm.MarketCapitalisationInMillion / highlight.RevenuePerShare.
 
-                var fairValue = FairValueEngine.DiscountedCurrentValue(eps, 3, growthRate / 100.0, inflation, fixincomeReturnRate);
+                var fairValue = FairValueEngine.DiscountedCurrentValue(eps, 3, growthRate / 100.0, inflation/10000.0, fixincomeReturnRate);
                 if (eps <= 0 && fairValue <= 0)
                     fairValue = FairValueEngine.FutureValue(highlight.RevenuePerShare, growthRate / 100.0, 1) * 1.5;
                 Debug.WriteLine("{0}      FairValue : {1}      forward P/E : {2}       EV/Rev : {3}       Margin: {4}          ShortPercentage : {5}       EPS: {6}      GrowthRate: {7}",
@@ -539,6 +552,9 @@ namespace NB.Core.Web.UnitTest
                                     BindingFlags.Instance);
             foreach (PropertyInfo property in properties)
             {
+                if (property.GetIndexParameters().Length>0)
+                    continue;
+
                 object propValue = property.GetValue(obj, null);
                 if (property.PropertyType.Assembly == objType.Assembly)
                 {

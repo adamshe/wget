@@ -12,7 +12,6 @@ namespace NB.Core.Web.Interfaces
 {
     interface IValuationQuery
     {
-        Task<YahooQuotesAggregate> GetQuote(string[] tickers, params QuoteProperty[] quoteProperties);
-       
+        Task<PotentialTarget> GetFairValue(string ticker);       
     }
 }

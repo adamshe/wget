@@ -56,7 +56,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\Yahoo.cs" />
-    <Compile Include="DownloadClient\MorningPerformanceDownloader.cs" />
+    <Compile Include="DownloadClient\CpiDataDownloader.cs" />
+    <Compile Include="DownloadClient\MorningStarPerformanceDownloader.cs" />
     <Compile Include="DownloadClient\MorningStartValuationDownloader.cs" />
     <Compile Include="DownloadClient\NasdaqEarningHistoryDownloader.cs" />
     <Compile Include="DownloadClient\GoogleIntradayCsvDownloader.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="DownloadClient\YahooCompanyStatisticsDownloader.cs" />
     <Compile Include="DownloadClient\YahooValuationDownloader.cs" />
     <Compile Include="DownloadSettings\CompanyStatisticsSetting.cs" />
+    <Compile Include="DownloadSettings\CpiDataSetting.cs" />
     <Compile Include="DownloadSettings\NasdaqHoldingSetting.cs" />
     <Compile Include="DownloadSettings\SecEdgarSetting.cs" />
     <Compile Include="DownloadSettings\SPYValuationSetting.cs" />
@@ -89,6 +91,7 @@
     <Compile Include="Models\AnalystTarget.cs" />
     <Compile Include="Models\CompanyFinancialHighlights.cs" />
     <Compile Include="Models\Context\StockContext.cs" />
+    <Compile Include="Models\CpiData.cs" />
     <Compile Include="Models\DataPoint\CompanyStatisticsData.cs" />
     <Compile Include="Models\CompanyTradingInfo.cs" />
     <Compile Include="Models\CompanyValuationMeasures.cs" />
@@ -133,6 +136,7 @@
     <Compile Include="Models\DataPoint\YahooQuotesData.cs" />
     <Compile Include="Models\TickerEarningDate.cs" />
     <Compile Include="Models\YCurrencyID.cs" />
+    <Compile Include="Utility\DownloadHelper.cs" />
     <Compile Include="Utility\FinanceHelper.cs" />
     <Compile Include="Extensions\ForEachAsync.cs" />
     <Compile Include="Models\HistQuotesData.cs" />

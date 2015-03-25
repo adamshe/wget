@@ -12,6 +12,9 @@ namespace NB.Core.Web.Models
         public PerformanceDataAggregate(string ticker)
         {
             Ticker = ticker;
+            StockPerformance = new PerformanceData();
+            Industryformance = new PerformanceData();
+            SP500formance = new PerformanceData();
         }
         public string Ticker { get; set; }
 
@@ -23,8 +26,11 @@ namespace NB.Core.Web.Models
     }
 
     public class PerformanceData
-    {       
-        public string Ticker { get; set; }
+    {
+        [XPath("/tr[1]/th[1]", Name = "Stock")]
+        [XPath("/tr[2]/th[1]", Name = "Industry")]
+        [XPath("/tr[3]/th[1]", Name = "SP500")]
+        public string Name { get; set; }
 
         [XPath("/tr[1]/td[1]", Name = "Stock")]
         [XPath("/tr[2]/td[1]", Name = "Industry")]

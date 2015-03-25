@@ -44,6 +44,8 @@ using System.Threading;
 using System.Xml.Serialization;
 using System.Xml.Linq;
 using NB.Core.Web.Extensions;
+using NB.Core.Web.DownloadSettings;
+using NB.Core.Web.DownloadClient;
 namespace NB.Core.Web.Utility
 {
     public static class MyHelper
@@ -247,7 +249,7 @@ namespace NB.Core.Web.Utility
             var startIndex = content.IndexOfOccurence(tableStart, nthTable);
             var endIndex = content.IndexOf(tableEnd, startIndex);
 
-            var targetTableStr = content.Substring(startIndex, endIndex + tableEnd.Length);
+            var targetTableStr = content.Substring(startIndex, endIndex + tableEnd.Length - startIndex);
             XParseDocument doc = MyHelper.ParseXmlDocument(targetTableStr);
             return doc;
         }
@@ -595,28 +597,28 @@ namespace NB.Core.Web.Utility
         }
 
        
-            public static T Deserialize<T>(XDocument doc)
-            {
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+        public static T Deserialize<T>(XDocument doc)
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
 
-                using (var reader = doc.Root.CreateReader())
-                {
-                    return (T)xmlSerializer.Deserialize(reader);
-                }
+            using (var reader = doc.Root.CreateReader())
+            {
+                return (T)xmlSerializer.Deserialize(reader);
+            }
+        }
+
+        public static XDocument Serialize<T>(T value)
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+
+            XDocument doc = new XDocument();
+            using (var writer = doc.CreateWriter())
+            {
+                xmlSerializer.Serialize(writer, value);
             }
 
-            public static XDocument Serialize<T>(T value)
-            {
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
-
-                XDocument doc = new XDocument();
-                using (var writer = doc.CreateWriter())
-                {
-                    xmlSerializer.Serialize(writer, value);
-                }
-
-                return doc;
-            }
+            return doc;
+        }       
        
         //private MyHelper() { }
         //static MyHelper() { }

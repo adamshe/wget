@@ -2,7 +2,7 @@
 
 namespace NB.Core.Web.DownloadSettings
 {
-    public class TrefisSetting : BaseSetting
+    public class CpiDataSetting : BaseSetting
     {
         public override string GetUrl()
         {
@@ -16,14 +16,13 @@ namespace NB.Core.Web.DownloadSettings
 
         protected sealed override string UrlStr
         {
-            get { return "http://www.trefis.com/companies"; }
+            get { return "http://inflationdata.com/Inflation/Consumer_Price_Index/HistoricalCPI.aspx?reloaded=true"; }
         }
 
 
         public override string GetTickerFromUrl(string url)
-        {
-            var ticker = MyHelper.ExtractPattern(url, @".*\?hm=(?<ticker>\^?\w*).trefis$");
-            return ticker;
+        {            
+            return "US CPI Data";
         }
        
     }

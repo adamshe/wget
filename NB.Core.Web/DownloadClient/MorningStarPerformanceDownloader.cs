@@ -26,17 +26,18 @@ namespace NB.Core.Web.DownloadClient
             XParseDocument resultNode;
             var mySetting = Setting as MorningStarValuationSetting;
            
-            resultNode = MyHelper.GetResultTable(content, 1, "<table class=\"r_table3  width955px print97\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"width:955px\">");
-            ParseTable ( aggregate.StockPerformance, resultNode, "Stock" );
-            ParseTable ( aggregate.Industryformance, resultNode, "Industry");
-            ParseTable ( aggregate.SP500formance, resultNode, "SP500");
+            resultNode = MyHelper.GetResultTable(content, 1, "<table class=\"r_table3");
+            XParseElement tbody = XPath.GetElement("//table/tbody[1]", resultNode);
+            ParseTable(aggregate.StockPerformance, tbody, "Stock");
+            ParseTable(aggregate.Industryformance, tbody, "Industry");
+            ParseTable(aggregate.SP500formance, tbody, "SP500");
 
 
             return aggregate;
         }
 
-        private static void ParseTable(PerformanceData perfData, XParseDocument resultNode, string name)
-        {           
+        private static void ParseTable(PerformanceData perfData, XParseElement resultNode, string name)
+        {
             XParseElement targetNode;
             XPathAttribute xpath;
             object value;
