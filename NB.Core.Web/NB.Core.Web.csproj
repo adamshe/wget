@@ -90,6 +90,9 @@
     <Compile Include="Interfaces\IValuationQuery.cs" />
     <Compile Include="Models\AnalystTarget.cs" />
     <Compile Include="Models\CompanyFinancialHighlights.cs" />
+    <Compile Include="Models\Context\IndustryContext.cs" />
+    <Compile Include="Models\Context\MarketContext.cs" />
+    <Compile Include="Models\Context\SectorContext.cs" />
     <Compile Include="Models\Context\StockContext.cs" />
     <Compile Include="Models\CpiData.cs" />
     <Compile Include="Models\DataPoint\CompanyStatisticsData.cs" />
@@ -102,16 +105,13 @@
     <Compile Include="Models\DataPoint\ValuationDataPoint.cs" />
     <Compile Include="Models\DataPoint\EarningHistoryData.cs" />
     <Compile Include="Models\FinvizCompanyDetails.cs" />
-    <Compile Include="Models\Context\IndustryContext.cs" />
     <Compile Include="Models\Mapping\PriceDataGoogleMapping.cs" />
     <Compile Include="Models\Mapping\PriceDataYahooMapping.cs" />
-    <Compile Include="Models\Context\MarketContext.cs" />
     <Compile Include="Models\DataPoint\SPYValuationDataPoint.cs" />
     <Compile Include="Models\NasdaqEarningForecastResult.cs" />
     <Compile Include="Models\PerformanceData.cs" />
     <Compile Include="Models\PotentialTarget.cs" />
     <Compile Include="Models\DataPoint\PriceDataPoint.cs" />
-    <Compile Include="Models\Context\SectorContext.cs" />
     <Compile Include="Models\SharesSplitFactor.cs" />
     <Compile Include="Models\DataSectionManager.cs" />
     <Compile Include="Models\TrefisCompanyCoveredInfo.cs" />
