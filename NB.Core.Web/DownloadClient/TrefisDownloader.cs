@@ -9,14 +9,14 @@ using System;
 using System.IO;
 namespace NB.Core.Web.DownloadClient
 {
-    public class TrefisDownloader : BaseDownloader<TrefisCompanyCoveredInfoResult>
+    public class TrefisDownloader : BaseDownloader<TrefisCompanyCoveredInfoAggregate>
     {
         public TrefisDownloader(BaseSetting setting): base(setting)
         {
 
         }
         
-        protected override TrefisCompanyCoveredInfoResult ConvertResult(string contentStr, string ticker = "")
+        protected override TrefisCompanyCoveredInfoAggregate ConvertResult(string contentStr, string ticker = "")
         {
             List<TrefisCompanyCoveredInfoData> companies = new List<TrefisCompanyCoveredInfoData>(100);
             var normalizeContent = contentStr.Replace("\r\n", "").Replace("\t", "");
@@ -76,7 +76,7 @@ namespace NB.Core.Web.DownloadClient
 
             }
 
-            return new TrefisCompanyCoveredInfoResult(dataList.ToArray());
+            return new TrefisCompanyCoveredInfoAggregate(dataList.ToArray());
         }
     }
 }

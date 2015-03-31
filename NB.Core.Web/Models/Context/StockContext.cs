@@ -11,6 +11,19 @@ namespace NB.Core.Web.Models
 {
     public class StockContext
     {
+        // FA ValuationDataPoint Yahoo
+        // PA analyst ratings up/downgrade http://www.analystratings.net/  find Ass and Ax analyst
+        // BA Business momentum analysis yahoo Analyst Estimate, Zack Cash Flow growth
+        // TA input: dataPoints[], process: scan pattern, strength, statistics (space, time), 
+        //output TradingStatisticsAggregate (Type: Range, Uptrend, Downtrend, Consecutive Days Up, Consecutive Days Down, Up points, Down Points,Weekday up/down,  )
+        // TradingStrategy {TradingStatisticsAggregate,Enter: buy price, qty(kelly), 
+        //Exit: sell price , Stop: stop price, 
+        //Time Window: holding period, Winning: Rate }
+        // Trefis is the filter
+        // Neural Network for earning play pattern
+        // Calendar cycle
+        // Stock Correlation
+        // Map (GS opinion manual set)
         string[] _tickers;
         /*
          Yahoo Sector, Industry ValuationDataPoint
@@ -33,8 +46,6 @@ namespace NB.Core.Web.Models
                 try
                 {
                     this.PopulateYahooValuationDataPoint(ticker).Wait();
-                    
-                   
                 }
                 catch (Exception ex)
                 {
@@ -123,7 +134,8 @@ namespace NB.Core.Web.Models
             var setting = new YahooValuationSetting();
             var downloader = new YahooValuationDownloader(setting);
             _yahooValDataPoint = await downloader.DownloadObjectTaskAsync(setting.GetUrl(ticker)).ConfigureAwait(false);
-            _yahoo.Add(ticker, _yahooValDataPoint);
+            if (!_yahoo.ContainsKey(ticker))
+                _yahoo.Add(ticker, _yahooValDataPoint);
         }
 
         public async Task PopulateNasdaqValuationDataPoint (string ticker)
@@ -131,7 +143,8 @@ namespace NB.Core.Web.Models
             var setting = new NasdaqEarningForecastSetting(ticker);
             var downloader = new NasdaqEarningForecastDownloader(setting);
             _nasdaqEarningForecast = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
-             _nasdaq.Add(ticker, _nasdaqEarningForecast);        
+            if (!_nasdaq.ContainsKey(ticker))
+                 _nasdaq.Add(ticker, _nasdaqEarningForecast);        
         }
 
         public async Task PopulateMorningStarValuationDataPoint(string ticker)

@@ -6,6 +6,34 @@ using System.Threading.Tasks;
 
 namespace NB.Core.Web.Models
 {
+    public class PriceDataPointAggregate
+    {
+        PriceDataPoint[] _dataPoints;
+        public PriceDataPointAggregate(PriceDataPoint[] dataPoints)
+        {            
+           _dataPoints = dataPoints.ToArray();
+        }
+
+        public IEnumerator<PriceDataPoint> Forward
+        {
+            get
+            {
+                for (int i = 0 ; i < _dataPoints.Length ; i++)
+                    yield return _dataPoints[i];
+            }
+        }
+
+        public IEnumerator<PriceDataPoint> Backward
+        {
+            get
+            {
+                for (int i = _dataPoints.Length; i > 0; i--)
+                    yield return _dataPoints[i];
+            }
+        }
+
+    }
+
     public class PriceDataPoint
     {
         //public static string TimestampBase { get; set; }

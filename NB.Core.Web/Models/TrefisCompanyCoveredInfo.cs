@@ -40,7 +40,7 @@ namespace NB.Core.Web.Models
         [DataMember(Name = "trefis")]
         public float TrefisTarget { get; set; }
         
-        public float PriceGap { get {return ( MarketPrice - TrefisTarget) / MarketPrice;} }
+        public float PriceGap { get {return  (TrefisTarget - MarketPrice ) / MarketPrice;} }
 
         [DataMember(Name="market")]
         public float MarketPrice { get; set; }
@@ -53,16 +53,24 @@ namespace NB.Core.Web.Models
         public TrefisCompanyCoveredInfoBullishData NumBullish { get; set; }
     }
 
-    public class TrefisCompanyCoveredInfoResult
+    public class TrefisCompanyCoveredInfoAggregate
     {
         private TrefisCompanyCoveredInfoData[] mItems = null;
         public TrefisCompanyCoveredInfoData[] Items
         {
             get { return mItems; }
         }
-        internal TrefisCompanyCoveredInfoResult(TrefisCompanyCoveredInfoData[] items)
+        internal TrefisCompanyCoveredInfoAggregate(TrefisCompanyCoveredInfoData[] items)
         {
             mItems = items;
+        }
+
+        public TrefisCompanyCoveredInfoData this[string ticker]
+        {
+            get
+            {
+                return mItems.Where(item => string.Compare(item.Ticker,ticker, true)==0).FirstOrDefault();
+            }
         }
     }
 }

@@ -178,7 +178,8 @@ namespace NB.Core.Web.UnitTest
         {
             var setting = new TrefisSetting();
             var downloader = new TrefisDownloader(setting);
-            var result = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
+            TrefisCompanyCoveredInfoAggregate result = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
+            var bib = result["bib"];
             foreach (var item in result.Items)
             {
                 Debug.WriteLine(string.Format("{0}     {1}        {2}       {3}       {4}      {5}              {6}",
@@ -291,7 +292,7 @@ namespace NB.Core.Web.UnitTest
           //  var currentPrice = DownloadHelper.GetQuote(new string[] { ticker }, QuoteProperty.LastTradePriceOnly, QuoteProperty.ChangeInPercent);
 
             double inflation = await DownloadHelper.GetCpiData(); //todo: get from yahoo quote
-            double fixincomeReturnRate = 0.0795; //todo: get from yahoo quote
+            double fixincomeReturnRate = 0.0796; //todo: get from yahoo quote
             var setting = new CompanyStatisticsSetting("CSCO");
             var dl = new YahooCompanyStatisticsDownloader(setting);
             var bag = new ConcurrentBag<CompanyStatisticsData>();
