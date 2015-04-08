@@ -13,7 +13,8 @@ namespace NB.Core.Web.DownloadClient
 {
     public class YahooCompanyStatisticsDownloader : BaseDownloader<CompanyStatisticsAggregate>
     {
-        public YahooCompanyStatisticsDownloader( BaseSetting setting) : base (setting)
+        public YahooCompanyStatisticsDownloader(YahooCompanyStatisticsSetting setting)
+            : base(setting)
         {
 
         }

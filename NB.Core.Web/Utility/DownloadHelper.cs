@@ -24,7 +24,7 @@ namespace NB.Core.Web.Utility
 
         public static async Task<YahooQuotesAggregate> GetQuote(string[] tickers, params QuoteProperty[] quoteProperties)
         {
-            var setting = new YahooQuotesSettings();
+            var setting = new YahooQuotesSetting();
             setting.IDs = tickers;
             var downloader = new YahooQuotesDownloader(setting);
             var result = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);

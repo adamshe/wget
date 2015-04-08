@@ -16,7 +16,7 @@ namespace NB.Core.Web.DownloadClient
     public class GoogleIntradayCsvDownloader : BaseDownloader<IEnumerable<PriceDataPoint>>
     {
         private const string columnSeparator = ";";
-        public GoogleIntradayCsvDownloader(BaseSetting setting)
+        public GoogleIntradayCsvDownloader(GoogleIntradayCsvSetting setting)
             : base(setting)
         {
             

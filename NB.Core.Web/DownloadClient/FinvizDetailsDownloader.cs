@@ -12,7 +12,7 @@ namespace NB.Core.Web.DownloadClient
 {
     public class FinvizDetailsDownloader : BaseDownloader<FinvizCompanyDetails>
     {
-        public FinvizDetailsDownloader(BaseSetting setting)
+        public FinvizDetailsDownloader(FinvizDetailsSetting setting)
             : base(setting)
         {
 

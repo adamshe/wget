@@ -150,7 +150,7 @@ namespace NB.Core.Web.Models
         public async Task PopulateMorningStarValuationDataPoint(string ticker)
         {
             var setting = new MorningStarValuationSetting(ticker);
-            var downloader = new MorningStartValuationDownloader(setting);
+            var downloader = new MorningStarValuationDownloader(setting);
             var current = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
 
             _morningStarValuationMetric = new MoringStartValuationAggregate(ticker);

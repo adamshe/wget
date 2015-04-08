@@ -10,10 +10,10 @@ using System;
 
 namespace NB.Core.Web.DownloadClient
 {
-    public class MorningStartValuationDownloader : BaseDownloader<MorningStarValuation>
+    public class MorningStarValuationDownloader : BaseDownloader<MorningStarValuation>
     {
 
-        public MorningStartValuationDownloader(BaseSetting setting)
+        public MorningStarValuationDownloader(MorningStarValuationSetting setting)
             : base(setting)
         {
 

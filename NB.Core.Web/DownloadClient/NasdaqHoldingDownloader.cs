@@ -13,7 +13,8 @@ namespace NB.Core.Web.DownloadClient
 {
     public class NasdaqHoldingDownloader : BaseDownloader<HoldingDataPointAggregate>
     {
-        public NasdaqHoldingDownloader(BaseSetting setting) : base(setting)
+        public NasdaqHoldingDownloader(NasdaqHoldingSetting setting)
+            : base(setting)
         {
 
         }

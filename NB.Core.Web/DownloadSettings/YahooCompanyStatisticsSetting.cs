@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace NB.Core.Web.DownloadSettings
 {
-    public class CompanyStatisticsSetting : BaseSetting
+    public class YahooCompanyStatisticsSetting : BaseSetting
     {
-        public CompanyStatisticsSetting()
+        public YahooCompanyStatisticsSetting()
         {
             Ticker = string.Empty;
         }
 
-        public CompanyStatisticsSetting(string ticker)
+        public YahooCompanyStatisticsSetting(string ticker)
         {
             Ticker = ticker;
         }

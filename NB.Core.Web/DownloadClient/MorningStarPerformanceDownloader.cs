@@ -10,10 +10,10 @@ using System;
 
 namespace NB.Core.Web.DownloadClient
 {
-    public class MorningStartPerformanceDownloader : BaseDownloader<PerformanceDataAggregate>
+    public class MorningStarPerformanceDownloader : BaseDownloader<PerformanceDataAggregate>
     {
 
-        public MorningStartPerformanceDownloader(BaseSetting setting)
+        public MorningStarPerformanceDownloader(MorningStarPerformanceSetting setting)
             : base(setting)
         {
 

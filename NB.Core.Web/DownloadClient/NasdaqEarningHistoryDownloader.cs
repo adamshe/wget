@@ -17,7 +17,7 @@ namespace NB.Core.Web.DownloadClient
 {
     public class NasdaqEarningHistoryDownloader : BaseDownloader<EarningHistoryDataAggregate>
     {
-        public NasdaqEarningHistoryDownloader(BaseSetting setting) : base (setting)
+        public NasdaqEarningHistoryDownloader(NasdaqEarningHistorySetting setting) : base (setting)
         {
 
         }

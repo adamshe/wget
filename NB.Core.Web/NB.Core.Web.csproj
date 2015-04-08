@@ -56,9 +56,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\Yahoo.cs" />
+    <Compile Include="DownloadClient\AnalystRatingsDownloader.cs" />
     <Compile Include="DownloadClient\CpiDataDownloader.cs" />
     <Compile Include="DownloadClient\MorningStarPerformanceDownloader.cs" />
-    <Compile Include="DownloadClient\MorningStartValuationDownloader.cs" />
+    <Compile Include="DownloadClient\MorningStarValuationDownloader.cs" />
     <Compile Include="DownloadClient\NasdaqEarningHistoryDownloader.cs" />
     <Compile Include="DownloadClient\GoogleIntradayCsvDownloader.cs" />
     <Compile Include="DownloadClient\FinvizDetailsDownloader.cs" />
@@ -69,7 +70,8 @@
     <Compile Include="DownloadClient\SPYValuationDownloader.cs" />
     <Compile Include="DownloadClient\YahooCompanyStatisticsDownloader.cs" />
     <Compile Include="DownloadClient\YahooValuationDownloader.cs" />
-    <Compile Include="DownloadSettings\CompanyStatisticsSetting.cs" />
+    <Compile Include="DownloadSettings\YahooCompanyStatisticsSetting.cs" />
+    <Compile Include="DownloadSettings\AnalystRatingsSetting.cs" />
     <Compile Include="DownloadSettings\CpiDataSetting.cs" />
     <Compile Include="DownloadSettings\NasdaqHoldingSetting.cs" />
     <Compile Include="DownloadSettings\SecEdgarSetting.cs" />
@@ -88,6 +90,7 @@
     <Compile Include="Extensions\DateTimeExtension.cs" />
     <Compile Include="Facade\QueryFacade.cs" />
     <Compile Include="Interfaces\IValuationQuery.cs" />
+    <Compile Include="Models\DataPoint\AnalystRatingsData.cs" />
     <Compile Include="Models\AnalystTarget.cs" />
     <Compile Include="Models\CompanyFinancialHighlights.cs" />
     <Compile Include="Models\Context\IndustryContext.cs" />
@@ -122,7 +125,7 @@
     <Compile Include="DownloadClient\BaseDownloader.cs" />
     <Compile Include="DownloadSettings\FinvizEarningCalendarSetting.cs" />
     <Compile Include="DownloadSettings\TrefisSetting.cs" />
-    <Compile Include="DownloadSettings\YahooQuotesSettings.cs" />
+    <Compile Include="DownloadSettings\YahooQuotesSetting.cs" />
     <Compile Include="DownloadSettings\YahooHistoryCsvSetting.cs" />
     <Compile Include="Enums\EarningHour.cs" />
     <Compile Include="Enums\YahooQuoteEnum.cs" />

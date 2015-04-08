@@ -10,8 +10,8 @@ namespace NB.Core.Web.Models
 {
     public class YahooQuotesAggregate : QuotesBaseAggregate
     {
-        private YahooQuotesSettings mSettings = null;
-        public YahooQuotesSettings Settings { get { return mSettings; } }
+        private YahooQuotesSetting mSettings = null;
+        public YahooQuotesSetting Settings { get { return mSettings; } }
 
         public new YahooQuotesData[] Items
         {
@@ -33,7 +33,7 @@ namespace NB.Core.Web.Models
             }
         }
 
-        internal YahooQuotesAggregate(YahooQuotesData[] items, YahooQuotesSettings settings)
+        internal YahooQuotesAggregate(YahooQuotesData[] items, YahooQuotesSetting settings)
             : base(items)
         {
             mSettings = settings;

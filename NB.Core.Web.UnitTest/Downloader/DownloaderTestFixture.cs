@@ -134,7 +134,7 @@ namespace NB.Core.Web.UnitTest
         [TestMethod]
         public async Task YahooQuotesDownloaderTest()
         {
-            var setting = new YahooQuotesSettings();
+            var setting = new YahooQuotesSetting();
             setting.Properties = new QuoteProperty[] {
                 QuoteProperty.LastTradePriceOnly,
                 QuoteProperty.ChangeInPercent,
@@ -162,6 +162,18 @@ namespace NB.Core.Web.UnitTest
                     ));
             }
         }
+        [TestMethod]
+        public async Task AnalystRatingsDownloaderTest()
+        {
+            var setting = new AnalystRatingsSetting("AAPL");
+            var downloader = new AnalystRatingsDownloader(setting);
+            //var result = await downloader.PostDownload(
+            //    new Dictionary<string,string>{{"textSearch", "JD" }});
+            var result = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
+            foreach (var item in result.AnalystRatings)
+                PrintProperties(item, 0);
+        }
+
         [TestMethod]
         public async Task CpiDownloaderTest ()
         {
@@ -293,7 +305,7 @@ namespace NB.Core.Web.UnitTest
 
             double inflation = await DownloadHelper.GetCpiData(); //todo: get from yahoo quote
             double fixincomeReturnRate = 0.0796; //todo: get from yahoo quote
-            var setting = new CompanyStatisticsSetting("CSCO");
+            var setting = new YahooCompanyStatisticsSetting("CSCO");
             var dl = new YahooCompanyStatisticsDownloader(setting);
             var bag = new ConcurrentBag<CompanyStatisticsData>();
             var results = await dl.BatchDownloadObjectsTaskAsync(setting.GetUrls(tickers)).ConfigureAwait(false);
@@ -449,7 +461,7 @@ namespace NB.Core.Web.UnitTest
         public async Task GetMorningStarValuationHistoryMetrics()
         {
             var setting = new MorningStarValuationSetting("RCL");
-            var downloader = new MorningStartValuationDownloader(setting);
+            var downloader = new MorningStarValuationDownloader(setting);
             var curVal = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
 
             setting.IsForwardValuation = true;
@@ -519,7 +531,7 @@ namespace NB.Core.Web.UnitTest
         public async Task MorningStarPerformanceTest()
         {
             var setting = new MorningStarPerformanceSetting("MSFT");
-            var downloader = new MorningStartPerformanceDownloader(setting);
+            var downloader = new MorningStarPerformanceDownloader(setting);
             var result = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
             PrintProperties(result.StockPerformance, 0);
             PrintProperties(result.Industryformance, 0);

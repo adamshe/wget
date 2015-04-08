@@ -11,7 +11,8 @@ namespace NB.Core.Web.DownloadClient
 {
     public class TrefisDownloader : BaseDownloader<TrefisCompanyCoveredInfoAggregate>
     {
-        public TrefisDownloader(BaseSetting setting): base(setting)
+        public TrefisDownloader(TrefisSetting setting)
+            : base(setting)
         {
 
         }

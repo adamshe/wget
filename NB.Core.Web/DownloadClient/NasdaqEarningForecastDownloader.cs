@@ -15,7 +15,8 @@ namespace NB.Core.Web.DownloadClient
 {
     public class NasdaqEarningForecastDownloader : BaseDownloader<NasdaqEarningForecastAggregate>
     {
-        public NasdaqEarningForecastDownloader(BaseSetting setting) : base (setting)
+        public NasdaqEarningForecastDownloader(NasdaqEarningForecastSetting setting)
+            : base(setting)
         {
 
         }

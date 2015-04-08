@@ -19,7 +19,8 @@ namespace NB.Core.Web.DownloadClient
     public class YahooValuationDownloader : BaseDownloader<ValuationDataPointAggregate>
     {
         private const string _baseUrl = "http://biz.yahoo.com/p/";
-        public YahooValuationDownloader(BaseSetting setting): base(setting)
+        public YahooValuationDownloader(YahooValuationSetting setting)
+            : base(setting)
         {
 
         }

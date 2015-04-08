@@ -13,7 +13,8 @@ namespace NB.Core.Web.DownloadClient
 {
     public class SecEdgarDownloader : BaseDownloader<PositionChangeDataPointAggregate>
     {
-        public SecEdgarDownloader(BaseSetting setting) : base (setting)
+        public SecEdgarDownloader(SecEdgarSetting setting)
+            : base(setting)
         {
         }
 

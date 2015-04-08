@@ -14,7 +14,7 @@ namespace NB.Core.Web.DownloadClient
 {
     public class FinvizEarningCalendarDownloader : BaseDownloader<TickerEarningDate>
     {
-        public FinvizEarningCalendarDownloader(BaseSetting setting)
+        public FinvizEarningCalendarDownloader(FinvizEarningCalendarSetting setting)
             : base(setting)
         {
 

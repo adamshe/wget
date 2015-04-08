@@ -15,7 +15,7 @@ namespace NB.Core.Web.DownloadClient
     public class YahooHistoryCsvDownloader : BaseDownloader<IEnumerable<PriceDataPoint>>
     {
         private const string columnSeparator = ";";
-        public YahooHistoryCsvDownloader(BaseSetting setting)
+        public YahooHistoryCsvDownloader(YahooHistoryCsvSetting setting)
             : base(setting)
         {
             

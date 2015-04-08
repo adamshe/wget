@@ -13,7 +13,8 @@ namespace NB.Core.Web.DownloadClient
     public class SPYValuationDownloader : BaseDownloader<SPYValuationDataPointAggregate>
     {
 
-        public SPYValuationDownloader(BaseSetting setting) : base(setting)
+        public SPYValuationDownloader(SPYValuationSetting setting)
+            : base(setting)
         {
 
         }

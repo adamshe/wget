@@ -10,6 +10,10 @@ using System.Net;
 using System.Diagnostics;
 using NB.Core.Web.Extensions;
 using System.Text;
+using System.Linq;
+using NB.Core.Web.Xml;
+using NB.Core.Web.Models.Metadata;
+using System.ComponentModel;
 namespace NB.Core.Web.DownloadClient
 {
     public abstract class BaseDownloader<T> : IDownload<T>, IBatchDownload<T>, IPostDownLoad<T>
@@ -260,6 +264,51 @@ namespace NB.Core.Web.DownloadClient
             string contentStr = await response.Content.ReadAsStringAsync();
             return contentStr;
         }
+
+        public T GetAggregate<U> (U[] items, Func<U[], T> creator)
+        {
+            return creator(items);        
+        }
+
+        public U[] GetResult<U> (XParseElement[] rows) where U : new() 
+        {
+            List<U> dataList = new List<U>(60);
+        //    T aggregate = new T(dataList.ToArray());
+            XParseElement targetNode = null;
+            XPathAttribute xpath;
+            object value;
+            int rowCount = 0;
+            foreach (XParseElement row in rows)
+            {
+                try
+                {
+                    if (rowCount++ == 0)
+                        continue;
+                    U data = new U();
+                    foreach (var property in data.GetType().GetProperties())
+                    {
+                        xpath = property.GetCustomAttributes(typeof(XPathAttribute), false).FirstOrDefault() as XPathAttribute;
+
+                        if (xpath == null)
+                            continue;
+
+                        targetNode = XPath.GetElement(xpath.Path, row);
+                        var val = targetNode.Value;
+
+                        var conv = TypeDescriptor.GetConverter(property.PropertyType);
+                        value = conv.ConvertFromString(val);
+                        property.SetValue(data, value);
+                    }
+                    dataList.Add(data);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(rowCount + ex.Message);
+                }
+            }
+            return dataList.ToArray();
+        }
+
         #endregion
     }
 }
