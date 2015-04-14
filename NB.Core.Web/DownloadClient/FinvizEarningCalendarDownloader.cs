@@ -29,6 +29,8 @@ namespace NB.Core.Web.DownloadClient
             
             XParseElement resultNode = XPath.GetElement("//results/td/strong", doc);
             if (resultNode == null)
+                resultNode = XPath.GetElement("//results/td/b", doc);
+            if (resultNode == null)
                 return new TickerEarningDate { Ticker=ticker };
 
             var dateStr = resultNode.Value;

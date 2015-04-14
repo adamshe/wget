@@ -16,7 +16,8 @@ namespace wget
     {
         static void Main(string[] args)
         {
-            TestConfiguration();
+            Download(args);
+            //TestConfiguration();
         }
 
         static void Download(string[] args)
@@ -74,11 +75,12 @@ namespace wget
             var downloader = new FinvizEarningCalendarDownloader(setting);
             var earningDates = await downloader.BatchDownloadObjectsTaskAsync(
                 setting.GetUrls(tickers)).ConfigureAwait(false);
-
+            var earningList = earningDates.ToList();
+            earningList.Sort(Comparer<TickerEarningDate>.Create((d1,d2) => d1.EarningDate.CompareTo(d2.EarningDate)));
             var filePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + @"\earningCalendar.txt";
             using (StreamWriter file = File.CreateText(filePath))
             {
-                foreach (var earning in earningDates)
+                foreach (var earning in earningList)
                     file.WriteLine(earning.Ticker.PadRight(5) + " " + earning.ToString());
             }
 //                @"AAPL,YHOO,MSFT,GOOGL,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,tsla,nflx,pcln,amzn,
