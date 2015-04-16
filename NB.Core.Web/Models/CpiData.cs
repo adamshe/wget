@@ -155,7 +155,7 @@ namespace NB.Core.Web.Models
         {
             for (int index = 12; index > 0; index--)
             {
-                if (!double.IsNaN(_cpi[index]))
+                if (!double.IsNaN(_cpi[index]) && _cpi[index]!=0.0)
                     return _cpi[index];
             }
             return double.NaN;

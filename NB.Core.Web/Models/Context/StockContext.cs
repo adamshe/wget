@@ -41,11 +41,14 @@ namespace NB.Core.Web.Models
         public StockContext(params string[] tickers)
         {
             _tickers = tickers;
-            Parallel.ForEach(tickers, ticker =>
+            Parallel.ForEach(tickers, new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount}, ticker =>
             {
+                Task taskYahoo = null;
+                Task taskNasdaq = null;
+                Task taskMorningStar = null;
                 try
                 {
-                    this.PopulateYahooValuationDataPoint(ticker).Wait();
+                    taskYahoo = this.PopulateYahooValuationDataPoint(ticker);
                 }
                 catch (Exception ex)
                 {
@@ -55,7 +58,7 @@ namespace NB.Core.Web.Models
 
                 try
                 {
-                    this.PopulateNasdaqValuationDataPoint(ticker).Wait();
+                    taskNasdaq = this.PopulateNasdaqValuationDataPoint(ticker);
                 }
                 catch (Exception ex)
                 {
@@ -65,13 +68,15 @@ namespace NB.Core.Web.Models
 
                 try
                 {
-                    this.PopulateMorningStarValuationDataPoint(ticker).Wait();
+                    taskMorningStar = this.PopulateMorningStarValuationDataPoint(ticker);
                 }
                 catch (Exception ex)
                 {
                     var msg = ex.Message;
                     _exceptions.Enqueue(ticker + " : morningstar 404");
                 }
+
+                Task.WaitAll(taskYahoo, taskNasdaq, taskMorningStar);
             });                      
         }
 
@@ -163,5 +168,14 @@ namespace NB.Core.Web.Models
             _morningStar.Add(ticker, _morningStarValuationMetric);    
         }
 
+        public Task PopulateAllInfo (string ticker)
+        {
+            return Task.WhenAll
+                (
+                    PopulateYahooValuationDataPoint(ticker),
+                    PopulateNasdaqValuationDataPoint(ticker),
+                    PopulateMorningStarValuationDataPoint(ticker)
+                 );            
+        }
     }
 }

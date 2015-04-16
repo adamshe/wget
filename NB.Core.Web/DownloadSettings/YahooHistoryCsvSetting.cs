@@ -12,25 +12,27 @@ namespace NB.Core.Web.DownloadSettings
 {
 	public class YahooHistoryCsvSetting : BaseSetting
 	{
-		/*
-		//http://table.finance.yahoo.com/table.csv?s={0}&a={1}&b={2}&c={3}&d={4}&e={5}&f={6}&g=d&ignore=.csv
-		 * 
-		 * You can ask the financial api, in some way like that:
+        /*
+        //http://table.finance.yahoo.com/table.csv?s={0}&a={1}&b={2}&c={3}&d={4}&e={5}&f={6}&g=d&ignore=.csv
+         * 
+         * You can ask the financial api, in some way like that:
 
 http://finance.yahoo.com/d/quotes.csv?s=
 And the historical data you can get by:
 
 http://finance.yahoo.com/q/hp?s=
-		 * */
+         * 
+         * API https://code.google.com/p/yahoo-finance-managed/wiki/csvHistQuotesDownload
+         * */
 
-		private string _intervel = Yahoo.Interval.Day;
+        private string _intervel = Yahoo.Interval.Day;
 		private DateTime _start;
 		private DateTime _end;
 
-		public YahooHistoryCsvSetting (string ticker)
+		public YahooHistoryCsvSetting (string ticker, int days=-1000)
 		{
 			Ticker = ticker;
-			_start = DateTime.Now.AddYears(-4 );
+			_start = DateTime.Now.AddDays(days);
 			_end = DateTime.Now;
 		}
 
@@ -67,9 +69,11 @@ http://finance.yahoo.com/q/hp?s=
 
 		public override string GetUrl(string ticker)
 		{
+			DateTime yahooStartDate = Start.AddMonths(-1);
+			DateTime yahooEndDate = End.AddMonths(-1);
 			return string.Format(UrlStr, ticker,
-					Start.AddMonths(-1).Month, Start.Day, Start.Year,
-					End.AddMonths(-1).Month, End.Day, End.Year,
+					yahooStartDate.Month, yahooStartDate.Day, yahooStartDate.Year,
+					yahooEndDate.Month, yahooEndDate.Day, yahooEndDate.Year,
 					_intervel);
 		}
 

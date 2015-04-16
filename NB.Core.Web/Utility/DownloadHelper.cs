@@ -22,10 +22,20 @@ namespace NB.Core.Web.Utility
             return cpi;
         }
 
+        public static async Task<double> GetRiskFreeRate()
+        {
+            var setting = new YahooQuotesSetting();
+            setting.IDs = new string [] {"^TNX"};
+            var downloader = new YahooQuotesDownloader(setting);
+            var result = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
+            return result.Items[0].LastTradePriceOnly;            
+        }
+
         public static async Task<YahooQuotesAggregate> GetQuote(string[] tickers, params QuoteProperty[] quoteProperties)
         {
             var setting = new YahooQuotesSetting();
             setting.IDs = tickers;
+            setting.Properties = quoteProperties;
             var downloader = new YahooQuotesDownloader(setting);
             var result = await downloader.DownloadObjectTaskAsync().ConfigureAwait(false);
             return result;

@@ -34,7 +34,7 @@ namespace NB.Core.Web.Models
 
     }
 
-    public class PriceDataPoint
+    public class PriceDataPoint : IEquatable<PriceDataPoint>
     {
         //public static string TimestampBase { get; set; }
 
@@ -56,6 +56,43 @@ namespace NB.Core.Web.Models
 
         public long Volume { get; set; }
 
-        public double Adjust { get; set; } 
+        public double Adjust { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+
+            PriceDataPoint p = obj as PriceDataPoint;
+
+            if (p == null)
+                return false;
+
+            return this.Equals(p);
+        }
+
+        public bool Equals(PriceDataPoint other)
+        {
+            if (other == null)
+                return false;
+
+            return Timestamp.Equals(other.Timestamp);
+        }
+
+        public static bool operator == (PriceDataPoint @this, PriceDataPoint other)
+        {
+            if (ReferenceEquals(@this, other))
+                return true;
+
+            if (@this == null || other == null)
+                return false;
+
+            return @this.Equals(other);
+        }
+
+        public static bool operator !=(PriceDataPoint @this, PriceDataPoint other)
+        {
+            return !(@this == other);
+        }
     }
 }

@@ -293,10 +293,12 @@ namespace NB.Core.Web.DownloadClient
                             continue;
 
                         targetNode = XPath.GetElement(xpath.Path, row);
-                        var val = targetNode.Value;
+                        var val = string.IsNullOrWhiteSpace(targetNode.Value) ? "0": targetNode.Value;
 
                         var conv = TypeDescriptor.GetConverter(property.PropertyType);
+                        
                         value = conv.ConvertFromString(val);
+                        
                         property.SetValue(data, value);
                     }
                     dataList.Add(data);

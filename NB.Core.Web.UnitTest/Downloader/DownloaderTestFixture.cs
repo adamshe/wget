@@ -106,7 +106,27 @@ namespace NB.Core.Web.UnitTest
                 Debug.WriteLine(filestr.ToString());          
         }
 
-      
+        [TestMethod]
+        public async Task YahooHistoryCvsDownloaderDataAnalysisTest()
+        {            
+            var setting = new YahooHistoryCsvSetting("QQQ", -100);
+            var downloader = new YahooHistoryCsvDownloader(setting);
+            var data = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
+            DateTime date = DateTime.Now.AddDays(-100);
+            var filterData = data.Where(point => point.Timestamp > date).ToList();
+            var analysis = new PriceStatisticsAggregate(filterData);
+            analysis.Partition();
+
+            foreach (var partition in analysis.Partitions)
+            {
+                Console.WriteLine("{0} {1} days  {2:MM/dd/yyyy} {3:MM/dd/yyyy}",
+                    partition.Direction,
+                    partition.Count,
+                    partition.DataRange.First().Timestamp,
+                    partition.DataRange.Last().Timestamp);
+            }
+
+        }
 
         [TestMethod]
         public async Task FinvizEarningCalendarDownloaderTest()
@@ -539,7 +559,7 @@ namespace NB.Core.Web.UnitTest
         }
 
         [TestMethod]
-        public void StockContextTest()
+        public async Task StockContextTest()
         {
             var symbles = MyHelper.GetStringToken(tickers, new string[] { ";", "," });////new string[] {"AAPL", "CSCO", "ACAD", "SGEN", "GOOGL"};
             var context = new StockContext(symbles);
@@ -552,6 +572,7 @@ namespace NB.Core.Web.UnitTest
             var currentPE = context.CurrentMorningStarValuationMetric.CurrentPE;
             var forwardPE = context.ForwardMorningStarValuationMetric.ForwardPE;
             var growth = currentPE / forwardPE - 1;
+            var bondRate = await DownloadHelper.GetRiskFreeRate();
 
         }
 

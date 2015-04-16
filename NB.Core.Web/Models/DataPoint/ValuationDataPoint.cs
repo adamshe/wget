@@ -18,6 +18,7 @@ namespace NB.Core.Web.Models
             Sector = sector;
             Industry = industry;
         }
+
         public ValuationDataPoint Self { get; set; }
 
         public ValuationDataPoint Sector { get; set; }
