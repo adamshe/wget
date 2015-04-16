@@ -618,9 +618,25 @@ namespace NB.Core.Web.Utility
             }
 
             return doc;
-        }       
-       
-        //private MyHelper() { }
-        //static MyHelper() { }
+        }
+
+        public static double CalculateStdDev(IEnumerable<double> values, double average = double.NaN)
+        {
+            double ret = 0;
+            double avg ;
+            if (values.Count() > 0)
+            {
+                //Compute the Average      
+                if (double.IsNaN(average))
+                    avg = values.Average();
+                else
+                    avg = average;
+                //Perform the Sum of (value-avg)_2_2      
+                double sum = values.Sum(d => Math.Pow(d - avg, 2));
+                //Put it all together      
+                ret = Math.Sqrt((sum) / (values.Count() - 1));
+            }
+            return ret;
+        }
     }
 }
