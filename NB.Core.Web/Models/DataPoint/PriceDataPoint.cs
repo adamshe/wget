@@ -382,8 +382,12 @@ namespace NB.Core.Web.Models
         {
             foreach (var partition in Partitions)
             {
-                if (Math.Abs(partition.PriceRange) <= 0.02)
+                if (Math.Abs(partition.PriceRangePercent) <= 0.01)
                     partition.Direction = TrendDirection.Range;
+                if (partition.AverageDailyStrength < 0 && partition.Direction == TrendDirection.Up ||
+                   partition.AverageDailyStrength > 0 && partition.Direction == TrendDirection.Down)
+                    partition.Direction = TrendDirection.Range;
+                
             }
         }
 
@@ -403,15 +407,9 @@ namespace NB.Core.Web.Models
         {
             get
             {
-                var upCount = from partition in _partitions
-                              let count = _partitions.Count(p =>p.Direction == TrendDirection.Up)                              
-                              select count;
-
-                var val = from partition in _partitions
-                          let sum = _partitions.Sum(p=>p.AverageDailyStrength)
-                          where partition.Direction == TrendDirection.Up
-                          select sum / upCount.First();
-                return val.First();
+                var count = _partitions.Count(p => p.Direction == TrendDirection.Up);
+                var val = _partitions.Where(p => p.Direction == TrendDirection.Up).Sum(p => p.AverageDailyStrength);
+                return val / count;
             }
         }
 
@@ -419,15 +417,9 @@ namespace NB.Core.Web.Models
         {
             get
             {
-                var downCount = from partition in _partitions
-                              let count = _partitions.Count(p => p.Direction == TrendDirection.Down)
-                              select count;
-
-                var val = from partition in _partitions
-                          let sum = _partitions.Sum(p => p.AverageDailyStrength)
-                          where partition.Direction == TrendDirection.Down
-                          select sum / downCount.First();
-                return val.First();
+                var count = _partitions.Count(p => p.Direction == TrendDirection.Down);
+                var val = _partitions.Where(p => p.Direction == TrendDirection.Down).Sum(p => p.AverageDailyStrength);
+                return val / count;
             }
         }
 

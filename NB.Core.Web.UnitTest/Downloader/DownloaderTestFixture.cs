@@ -31,10 +31,11 @@ namespace NB.Core.Web.UnitTest
 
         string[] friendsEmail = { "adamshe@gmail.com" };//"laofengs@gmail.com", 
         //LNG,
-        string tickers = @"AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
+        string tickers = "AAPL,AMZN,PCLN,ISRG,CYBR,JD,GILD";/*@"AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
             FB,LNKD,TWTR,JD,JMEI,DATA,NOW,GILD,SPLK,TSO,
             LNG,EOG,APC,GPRO,NUAN,RCL,MCO,DFS,AXP,MA,V,GS,BAC,JPM,
             C,JUNO,KITE,BLUE,GMCR,PCYC,INCY,GEVA,ACAD,TKMR,CELG,REGN,BIIB,ICPT";
+                          * */
 
         string index = @"SPY,IWM,TQQQ,BIB,CURE,XLE,XLF,EEM,FXI,RTH, XTN";//TZA,TNA,
 
