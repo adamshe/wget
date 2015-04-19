@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace NB.Core.Web.Models
 {
+    /*
     public class PriceDataPointAggregate
     {
         PriceDataPoint[] _dataPoints;
@@ -37,16 +38,54 @@ namespace NB.Core.Web.Models
         }
 
     }
-
+    */
     public class PriceDataPoint : IEquatable<PriceDataPoint>
-    {
-        //public static string TimestampBase { get; set; }
+    {        
+        public PriceDataPoint() { }
 
-        //public static int Interval { get; set; }
+        public PriceDataPoint(PriceDataPoint p)
+        {
+            this.Timestamp = p.Timestamp;
+            this.Open = p.Open;
+            this.High = p.High;
+            this.Low = p.Low;
+            this.Close = p.Close;
+            this.Volume = p.Volume;
+            this.Adjust = p.Adjust;
+            this.Index = p.Index;
+            this.Previous = p.Clone();
+        }
 
-        //public static int  Offset { get; set; }
+        public PriceDataPoint Clone()
+        {
+            return new PriceDataPoint
+            {
+                Timestamp = this.Timestamp,
+                Open = this.Open,
+                High = this.High,
+                Low = this.Low,
+                Close = this.Close,
+                Volume = this.Volume,
+                Adjust = this.Adjust,
+                Index = this.Index,
+                Previous = this.Previous != null ? this.Previous.Clone() : null
+            };
+        }
 
-        //public string Timestamp { get; set; }
+        public int Index { get; set; }
+
+        public double Change 
+        {
+            get
+            {
+                double change = Close/Open - 1;
+                if( Previous != null)
+                    change = (Close / Previous.Close) - 1;
+                return change;
+            }
+        }
+
+        public PriceDataPoint Previous {get; set;}
 
         public DateTime Timestamp { get; set; }
 
@@ -64,9 +103,28 @@ namespace NB.Core.Web.Models
 
         #region Compute Value
 
+        /// <summary>
+        /// How much money needed to move one bps
+        /// </summary>
+        public double MoneyDelta
+        {
+            get
+            {
+                return (MedianPrice * Volume) / ((Close - Open) * 10000 / Open);
+            }
+        }
+
         public double PriceOverVolume 
         {
             get 
+            {
+                return MedianPrice / Volume;
+            } 
+        }
+
+        public double MedianPrice
+        {
+            get
             {
                 double median;
                 if (BullishIndex >= 0.5)
@@ -76,7 +134,7 @@ namespace NB.Core.Web.Models
                 else
                     median = (Open + Low + High + Close) / 4.0;
 
-                return median / Volume;
+                return median;
             } 
         }
 
@@ -130,18 +188,8 @@ namespace NB.Core.Web.Models
             return !(@this == other);
         }
 
-        #endregion
+        #endregion       
     }
-
-    public class StrengthStatistics
-    {
-        public double PriceOverVolume { get; set; }
-
-        public double ClosePosition { get; set; }
-
-        public double MedianPrice { get; set; }
-    }
-
 
 
     public class DataRangePartition : IEquatable<DataRangePartition>
@@ -153,6 +201,11 @@ namespace NB.Core.Web.Models
             _previous = previous;
             _data = new List<PriceDataPoint>();
             Direction = TrendDirection.None;
+        }
+
+        public static DataRangePartition Create(DataRangePartition previous)
+        {
+            return new DataRangePartition(previous);
         }
 
         public IEnumerable<PriceDataPoint> DataRange { get { return _data; } }
@@ -173,16 +226,28 @@ namespace NB.Core.Web.Models
                 _data.Add(list[i]);
         }
 
-        public static DataRangePartition Create(DataRangePartition previous)
-        {
-            return new DataRangePartition(previous);
-        }
-
         public TrendDirection Direction { get; set; }
+
+        public double ChangeHandPercentage
+        {
+            get;
+            set;
+        }
 
         public DataRangePartition Previous { get { return _previous; } set { _previous = value; } }
 
         public int Count { get { return _data.Count; } }
+
+        #region Computed Properties
+        
+        public double TotalTradingVolume
+        {
+            get
+            {
+                var totalTradingVolume = _data.Sum(p => p.Volume);
+                return totalTradingVolume;
+            }
+        }
 
         public double PriceRange
         {
@@ -194,7 +259,7 @@ namespace NB.Core.Web.Models
             get { return PriceRange / _data.First().Open; }
         }
 
-        public double AverageDailyStrength 
+        public double AverageDailyGainInDollar 
         {
             get
             {
@@ -216,12 +281,18 @@ namespace NB.Core.Web.Models
         {
             get
             {
-                var adjustPriceArray = _data.Select(point => point.Close).ToArray();
+                var closePriceArray = _data.Select(point => point.Close).ToArray();
                // var stDev = MyHelper.CalculateStdDev(adjustPriceArray, AverageDailyStrength);
-                var stDev = MyHelper.CalculateStdDev(adjustPriceArray);
+                var stDev = MyHelper.CalculateStdDev(closePriceArray);
                 return stDev;
             }
         }
+
+        public double Velocity { get; set; }
+        
+        #endregion
+
+        #region Equality
 
         public override bool Equals(object obj)
         {
@@ -246,11 +317,13 @@ namespace NB.Core.Web.Models
             }
             return true;
         }
+
+        #endregion
     }
 
     public class PriceStatisticsAggregate
     {
-        private List<PriceDataPoint> _dataRange;
+        private List<PriceDataPoint> _dataPoints;
         private List<DataRangePartition> _partitions;
         private int _slideWindow;
         private string _ticker;
@@ -262,12 +335,45 @@ namespace NB.Core.Web.Models
             _companyinfo = dl.DownloadObjectTaskAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
             _ticker = ticker;
-            _dataRange = range.ToList<PriceDataPoint>();
+            _dataPoints = range.ToList<PriceDataPoint>();//.Select(d => { d.Index = i++; return d; }).
             _partitions = new List<DataRangePartition>(10);
             _slideWindow = 4;
+            Initialize();
         }
 
-        public string Ticker { get { return _ticker;  } }
+        private void Initialize ()
+        {
+            _dataPoints[0].Index = 0;
+            for (int i =1 ; i < _dataPoints.Count; i++)
+            {
+                _dataPoints[i].Index = i;
+                _dataPoints[i].Previous = _dataPoints[i-1];
+            }
+        }
+
+        public string Ticker 
+        { 
+            get 
+            { 
+                return _ticker;  
+            } 
+        }
+        
+        #region Timing
+
+        public IEnumerable<PriceDataPoint> MaxDrawDowns (int top)
+        {           
+            var list = _dataPoints.OrderBy(p => p.Change).Take(top).ToList();
+            return list.OrderBy (p => p.Timestamp);         
+        }
+
+        public IEnumerable<PriceDataPoint> MaxJumpups (int top)
+        {
+            var list = _dataPoints.OrderByDescending(p => p.Change).Take(top).ToList();
+            return list.OrderBy (p => p.Timestamp);
+        }
+
+        #endregion
 
         public IEnumerable<DataRangePartition> Partitions
         {
@@ -279,7 +385,7 @@ namespace NB.Core.Web.Models
         public int MoveNext(int index)
         {
             int nextindex = index + 1;
-            if (_dataRange.Count - 1 >= nextindex)
+            if (_dataPoints.Count - 1 >= nextindex)
                 return nextindex;
             else
                 return -1;
@@ -289,7 +395,7 @@ namespace NB.Core.Web.Models
         {
             var list = new List<int>(slide);
             var count = 0;
-            for (int i = index; i < _dataRange.Count; count++, i++)
+            for (int i = index; i < _dataPoints.Count; count++, i++)
             {
                 if (count == slide)
                     break;
@@ -306,15 +412,15 @@ namespace NB.Core.Web.Models
             int minIndex = -1, maxIndex = -1;
             for (int i = start; i <= end; i++)
             {
-                if (min > _dataRange[i].Close)
+                if (min > _dataPoints[i].Close)
                 {
-                    min = _dataRange[i].Close;
+                    min = _dataPoints[i].Close;
                     minIndex = i;
                 }
 
-                if (max < _dataRange[i].Close)
+                if (max < _dataPoints[i].Close)
                 {
-                    max = _dataRange[i].Close;
+                    max = _dataPoints[i].Close;
                     maxIndex = i;
                 }
             }
@@ -329,32 +435,29 @@ namespace NB.Core.Web.Models
             List<int> slide;
             List<int> maxmin;
             DataRangePartition partition = GetPartition();
-            while (start < _dataRange.Count)
+            while (start < _dataPoints.Count)
             {
                 slide = GetNextSlideWindow(start, SlideWindow);
                 maxmin = FindMaxAndMin(slide.First(), slide.Last());
                 //step 1: find direction
-                if (_dataRange[slide.LastOrDefault()].Close >= _dataRange[slide.FirstOrDefault()].Close)
+                if (_dataPoints[slide.LastOrDefault()].Close >= _dataPoints[slide.FirstOrDefault()].Close)
                 {
                     partition.Direction = TrendDirection.Up;
                     while (start != maxmin.Last())
                     {
                         for (int i = slide.First(); i <= maxmin.Last(); i++)
-                            partition.AddData(_dataRange[i]);
+                            partition.AddData(_dataPoints[i]);
                         start = maxmin.Last();
                         slide = GetNextSlideWindow(start, SlideWindow);
                         maxmin = FindMaxAndMin(slide.First(), slide.Last());
                     }
 
                     if (slide.Count == 1)
-                        partition.AddData(_dataRange[start]);
+                        partition.AddData(_dataPoints[start]);
 
                     start = maxmin.Last() + 1;
-                    if (start < _dataRange.Count)
+                    if (start < _dataPoints.Count)
                         partition = GetPartition();
-
-                    // _dataRange.Where((data, index) => index < slide.LastOrDefault() && index > slide.FirstOrDefault())
-                    //     .Max(data => data.CloseAdjusted);
                 }
                 else
                 {
@@ -362,17 +465,17 @@ namespace NB.Core.Web.Models
                     while (start != maxmin.First())
                     {
                         for (int i = slide.First(); i <= maxmin.First(); i++)
-                            partition.AddData(_dataRange[i]);
+                            partition.AddData(_dataPoints[i]);
                         start = maxmin.First();
                         slide = GetNextSlideWindow(start, SlideWindow);
                         maxmin = FindMaxAndMin(slide.First(), slide.Last());
                     }
 
                     if (slide.Count == 1)
-                        partition.AddData(_dataRange[start]);
+                        partition.AddData(_dataPoints[start]);
 
                     start = maxmin.First() + 1;
-                    if (start < _dataRange.Count)
+                    if (start < _dataPoints.Count)
                         partition = GetPartition();
                 }
             }
@@ -380,14 +483,18 @@ namespace NB.Core.Web.Models
 
         public void RunPartitionAnalysis()
         {
+            var floatShares = _companyinfo.Item.TradingInfo.FloatInMillion;
             foreach (var partition in Partitions)
             {
-                if (Math.Abs(partition.PriceRangePercent) <= 0.01)
+                //step 1: set Direction for Range Trading
+                if (Math.Abs(partition.PriceRangePercent) <= 0.01) //todo get better threshhold
                     partition.Direction = TrendDirection.Range;
-                if (partition.AverageDailyStrength < 0 && partition.Direction == TrendDirection.Up ||
-                   partition.AverageDailyStrength > 0 && partition.Direction == TrendDirection.Down)
+                if (partition.AverageDailyGainInDollar < 0 && partition.Direction == TrendDirection.Up ||
+                   partition.AverageDailyGainInDollar > 0 && partition.Direction == TrendDirection.Down)
                     partition.Direction = TrendDirection.Range;
-                
+
+                //step 2 set ChangeHandPercentage
+                partition.ChangeHandPercentage = (partition.TotalTradingVolume / 1000000) / floatShares;
             }
         }
 
@@ -403,12 +510,30 @@ namespace NB.Core.Web.Models
             }
         }
 
+        public double TotalChangeHandPercentage
+        {
+            get
+            {
+                return _partitions.Sum(p => p.ChangeHandPercentage);
+            }
+        }
+
+        public double TotalNetChangeHandPercentage
+        {
+            get
+            {
+                var up = _partitions.Where(p => p.Direction == TrendDirection.Up).Sum(p => p.ChangeHandPercentage);
+                var down = _partitions.Where(p => p.Direction == TrendDirection.Down).Sum(p => p.ChangeHandPercentage);
+                return up - down;
+            }
+        }
+
         public double UpdayAverageGain
         {
             get
             {
                 var count = _partitions.Count(p => p.Direction == TrendDirection.Up);
-                var val = _partitions.Where(p => p.Direction == TrendDirection.Up).Sum(p => p.AverageDailyStrength);
+                var val = _partitions.Where(p => p.Direction == TrendDirection.Up).Sum(p => p.AverageDailyGainInDollar);
                 return val / count;
             }
         }
@@ -418,7 +543,7 @@ namespace NB.Core.Web.Models
             get
             {
                 var count = _partitions.Count(p => p.Direction == TrendDirection.Down);
-                var val = _partitions.Where(p => p.Direction == TrendDirection.Down).Sum(p => p.AverageDailyStrength);
+                var val = _partitions.Where(p => p.Direction == TrendDirection.Down).Sum(p => p.AverageDailyGainInDollar);
                 return val / count;
             }
         }

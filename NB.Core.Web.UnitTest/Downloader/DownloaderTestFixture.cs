@@ -30,12 +30,12 @@ namespace NB.Core.Web.UnitTest
         string[] friendAtt = { "8483912608" }; //9172079948
 
         string[] friendsEmail = { "adamshe@gmail.com" };//"laofengs@gmail.com", 
-        //LNG,
-        string tickers = "AAPL,AMZN,PCLN,ISRG,CYBR,JD,GILD";/*@"AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
+        //"SPY,GMCR,AAPL,AMZN,PCLN,TRIP,EXPE,ISRG,CYBR,PANW,JD,GILD,JUNO,KITE,BLUE,MSFT,CSCO,NFLX,GOOGL";/
+        string tickers = @"SPY,AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
             FB,LNKD,TWTR,JD,JMEI,DATA,NOW,GILD,SPLK,TSO,
             LNG,EOG,APC,GPRO,NUAN,RCL,MCO,DFS,AXP,MA,V,GS,BAC,JPM,
             C,JUNO,KITE,BLUE,GMCR,PCYC,INCY,GEVA,ACAD,TKMR,CELG,REGN,BIIB,ICPT";
-                          * */
+                          
 
         string index = @"SPY,IWM,TQQQ,BIB,CURE,XLE,XLF,EEM,FXI,RTH, XTN";//TZA,TNA,
 
@@ -111,6 +111,7 @@ namespace NB.Core.Web.UnitTest
         public async Task YahooHistoryCvsDownloaderDataAnalysisTest()
         {
             var allTickers = tickers.Split(new char[]{','},StringSplitOptions.RemoveEmptyEntries);
+            List<PriceStatisticsAggregate> list = new List<PriceStatisticsAggregate>();
             foreach (var ticker in allTickers)
             {
                 try
@@ -118,48 +119,88 @@ namespace NB.Core.Web.UnitTest
                     var setting = new YahooHistoryCsvSetting(ticker, -100);
                     var downloader = new YahooHistoryCsvDownloader(setting);
                     var data = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
-                    DateTime date = new DateTime(2015, 1, 1);//DateTime.Now.AddDays(-100);
-                    var filterData = data.Where(point => point.Timestamp > date).ToList();
-                    var analysis = new PriceStatisticsAggregate(setting.Ticker, filterData);
+                  
+                    DateTime endDate = new DateTime(2015, 1, 29);//DateTime.Now.AddDays(-100);
+                    DateTime startDate = endDate.AddDays(-72);//DateTime.Now.AddDays(-100);
+                    var filterData = data.Where(point => point.Timestamp >= startDate && point.Timestamp <= endDate).ToList();
+                    PriceStatisticsAggregate analysis = new PriceStatisticsAggregate(setting.Ticker, filterData);
                     analysis.SlideWindow = 5;
                     analysis.Partition();
                     analysis.RunPartitionAnalysis();
 
-                    Console.WriteLine(analysis.Ticker);
-                    foreach (var partition in analysis.Partitions)
-                    {
-                        Console.WriteLine("{0} {1} days  {2:MM/dd/yyyy} {3:MM/dd/yyyy} daily: {4:f2} stdev: {5:f2} - gain {6:f2}",
-                            partition.Direction,
-                            partition.Count,
-                            partition.DataRange.First().Timestamp,
-                            partition.DataRange.Last().Timestamp,
-                            partition.AverageDailyStrength,
-                            partition.StDevStrength,
-                            partition.DataRange.Last().Close - partition.DataRange.First().Open
-                            );
-                    }
-
-                    Console.WriteLine("{0} days, Expected {1:p} up gain {2:f2} Direction {3} average up {4:f2} - daily average up {5:f2}",
-                        analysis.MaxUpPercent.Count,
-                        analysis.MaxUpPercent.PriceRangePercent,
-                        analysis.MaxUpPercent.PriceRange,
-                        analysis.MaxUpPercent.Direction,
-                        analysis.MaxUpPercent.AverageDailyStrength,
-                        analysis.UpdayAverageGain
-                        );
-
-                    Console.WriteLine("{0} days, Expected {1:p} down loss {2:f2}  Direction {3} average down {4:f2} -  daily average down {5:f3}",
-                        analysis.MaxDownPercent.Count,
-                        analysis.MaxDownPercent.PriceRangePercent,
-                        analysis.MaxDownPercent.PriceRange,
-                        analysis.MaxDownPercent.Direction,
-                        analysis.MaxDownPercent.AverageDailyStrength,
-                        analysis.DowndayAverageGain
-                        );
+                    list.Add(analysis);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ticker + " " + ex.Message);
+                }
+            }
+            var orderByVolumePartitions = list;/*.Where(a => //a.TotalNetChangeHandPercentage > 0 
+                 (((a.MaxUpPercent.AverageDailyGainInDollar + a.MaxDownPercent.AverageDailyGainInDollar) > 0 ) &&
+                 ((a.UpdayAverageGain + a.DowndayAverageGain) > 0) &&
+                  a.TotalChangeHandPercentage >= 0.6)
+                )
+                .OrderByDescending(aggregate => aggregate.TotalChangeHandPercentage);*/
+
+            foreach (var aggregate in orderByVolumePartitions)
+            {
+                try
+                {
+                    Console.WriteLine(aggregate.Ticker);
+                    foreach (var partition in aggregate.Partitions)
+                    {
+                        Console.WriteLine("{0} {1} days  {2:MM/dd/yyyy} {3:MM/dd/yyyy} daily gain: {4:f2} stdev: {5:f2} - TOTAL gain {6:f2}  change hand {7:p}",
+                            partition.Direction,
+                            partition.Count,
+                            partition.DataRange.First().Timestamp,
+                            partition.DataRange.Last().Timestamp,
+                            partition.AverageDailyGainInDollar,
+                            partition.StDevStrength,
+                            partition.DataRange.Last().Close - partition.DataRange.First().Open,
+                            partition.ChangeHandPercentage
+                            );
+                    }
+
+                    Console.WriteLine("{0} days, Expected {1:p} up gain {2:f2} Direction {3} average up {4:f2} - daily average up {5:f2}",
+                        aggregate.MaxUpPercent.Count,
+                        aggregate.MaxUpPercent.PriceRangePercent,
+                        aggregate.MaxUpPercent.PriceRange,
+                        aggregate.MaxUpPercent.Direction,
+                        aggregate.MaxUpPercent.AverageDailyGainInDollar,
+                        aggregate.UpdayAverageGain
+                        );
+
+                    Console.WriteLine("{0} days, Expected {1:p} down loss {2:f2}  Direction {3} average down {4:f2} -  daily average down {5:f3}",
+                        aggregate.MaxDownPercent.Count,
+                        aggregate.MaxDownPercent.PriceRangePercent,
+                        aggregate.MaxDownPercent.PriceRange,
+                        aggregate.MaxDownPercent.Direction,
+                        aggregate.MaxDownPercent.AverageDailyGainInDollar,
+                        aggregate.DowndayAverageGain
+                        );
+                    Console.WriteLine("Total Change Hand Percentage {0:p}", aggregate.TotalChangeHandPercentage);
+
+                    PriceDataPoint prev = null;
+                    foreach (var point in aggregate.MaxDrawDowns(5))
+                    {
+                        if (prev != null )
+                            Console.WriteLine("after {0} trading days", point.Index - prev.Index);
+                        Console.WriteLine("Big drawdown {0:p} on {1} {2}", point.Change, point.Timestamp.ToShortDateString(), point.Timestamp.DayOfWeek);
+                        prev = point;
+                        
+                    }
+
+                    foreach (var point in aggregate.MaxJumpups(5))
+                    {
+                        if (prev != null)
+                            Console.WriteLine("after {0} trading days", point.Index - prev.Index);
+                        Console.WriteLine("Big jump {0:p} on {1} {2}", point.Change, point.Timestamp.ToShortDateString(), point.Timestamp.DayOfWeek);
+                        prev = point;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(aggregate.Ticker + " " + ex.Message);
                 }
             }
         }
