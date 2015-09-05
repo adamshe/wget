@@ -31,10 +31,10 @@ namespace NB.Core.Web.UnitTest
 
         string[] friendsEmail = { "adamshe@gmail.com" };//"laofengs@gmail.com", 
         //"SPY,GMCR,AAPL,AMZN,PCLN,TRIP,EXPE,ISRG,CYBR,PANW,JD,GILD,JUNO,KITE,BLUE,MSFT,CSCO,NFLX,GOOGL";/
-        string tickers = @"MNST,SPY,AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
+        string tickers =  @"LVLT,MNST,SPY,AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN, 
             FB,LNKD,TWTR,JD,JMEI,DATA,NOW,GILD,SPLK,TSO,
             LNG,EOG,APC,GPRO,NUAN,RCL,MCO,DFS,AXP,MA,V,GS,BAC,JPM,
-            C,JUNO,KITE,BLUE,GMCR,PCYC,INCY,GEVA,ACAD,TKMR,CELG,REGN,BIIB,ICPT";
+            C,JUNO,KITE,BLUE,GMCR,PCYC,INCY,GEVA,ACAD,TKMR,CELG,REGN,BIIB,ICPT, TQQQ,BIB,CURE";
                           
 
         string index = @"SPY,IWM,TQQQ,BIB,CURE,XLE,XLF,EEM,FXI,RTH, XTN";//TZA,TNA,
@@ -117,7 +117,7 @@ namespace NB.Core.Web.UnitTest
             {
                 try
                 {
-                    var setting = new YahooHistoryCsvSetting(ticker, -100);
+                    var setting = new YahooHistoryCsvSetting(ticker.Trim(), -100);
                     var downloader = new YahooHistoryCsvDownloader(setting);
                     var data = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
 
@@ -136,7 +136,7 @@ namespace NB.Core.Web.UnitTest
                     Console.WriteLine(ticker + " " + ex.Message);
                 }
             }
-            var orderByVolumePartitions = list;/*.Where(a => //a.TotalNetChangeHandPercentage > 0 
+            var orderByVolumePartitions = list.OrderByDescending(item => item.Strength);/*.Where(a => //a.TotalNetChangeHandPercentage > 0 
                  (((a.MaxUpPercent.AverageDailyGainInDollar + a.MaxDownPercent.AverageDailyGainInDollar) > 0 ) &&
                  ((a.UpdayAverageGain + a.DowndayAverageGain) > 0) &&
                   a.TotalChangeHandPercentage >= 0.6)
@@ -636,6 +636,7 @@ namespace NB.Core.Web.UnitTest
             PrintProperties(result.SP500formance, 0);
         }
 
+        //important
         [TestMethod]
         public async Task StockContextTest()
         {

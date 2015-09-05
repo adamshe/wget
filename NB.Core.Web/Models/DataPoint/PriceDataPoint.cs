@@ -548,6 +548,8 @@ namespace NB.Core.Web.Models
             }
         }
 
+        public double Strength { get { return Math.Abs(UpdayAverageGain/DowndayAverageGain); }}
+
         public DataRangePartition MaxUpPercent
         {
             get 

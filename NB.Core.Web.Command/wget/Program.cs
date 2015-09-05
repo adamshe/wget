@@ -25,11 +25,11 @@ namespace wget
             var watch = new Stopwatch();
             watch.Start();
             var list = args.Length > 1 ? args[1] : ConfigurationManager.AppSettings["tickers"];
-            if (string.Compare(args[0], "e", true) == 0)
+            if ("e".Equals(args[0], StringComparison.InvariantCultureIgnoreCase))
             {
                 DownloadEarning(list).Wait();
             }
-            else if (string.Compare(args[0], "f", true) == 0)
+            else if ("f".Equals(args[0], StringComparison.InvariantCultureIgnoreCase))
             {
                 DownloadHistoryCsv(list).Wait();
             }

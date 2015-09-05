@@ -247,7 +247,7 @@ namespace NB.Core.Web.Utility
         public static XParseDocument GetResultTable(string content, int nthTable, string tableStart, string tableEnd = "</table>")
         {
             var startIndex = content.IndexOfOccurence(tableStart, nthTable);
-            var endIndex = content.IndexOf(tableEnd, startIndex);
+            var endIndex = content.IndexOf(tableEnd, startIndex, StringComparison.InvariantCultureIgnoreCase);
 
             var targetTableStr = content.Substring(startIndex, endIndex + tableEnd.Length - startIndex);
             XParseDocument doc = MyHelper.ParseXmlDocument(targetTableStr);
@@ -255,13 +255,22 @@ namespace NB.Core.Web.Utility
         }
         public static XParseElement GetResultTable (string content, string matchPattern, string targetXpath)
         {
-            var match = Regex.Matches(content, matchPattern, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);
+            try
+            {
+                var match = Regex.Matches(content, matchPattern, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);
 
-            var targetTableStr = match[0].Groups[0].Value;
-            XParseDocument doc = MyHelper.ParseXmlDocument(targetTableStr);
+                var targetTableStr = match[0].Groups[0].Value;
+                XParseDocument doc = MyHelper.ParseXmlDocument(targetTableStr);
 
-            var resultNode = XPath.GetElement(targetXpath, doc);
-            return resultNode;
+                var resultNode = XPath.GetElement(targetXpath, doc);
+                return resultNode;
+            }
+            catch (Exception)
+            {
+                Debug.Write(matchPattern);
+                Debug.Write(content);
+            }
+            return null;
         }
         public static XParseDocument ParseXmlDocument(string text) { return XmlParser.Parse(text); }
 
