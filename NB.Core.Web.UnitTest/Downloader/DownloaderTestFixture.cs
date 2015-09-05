@@ -31,7 +31,7 @@ namespace NB.Core.Web.UnitTest
 
         string[] friendsEmail = { "adamshe@gmail.com" };//"laofengs@gmail.com", 
         //"SPY,GMCR,AAPL,AMZN,PCLN,TRIP,EXPE,ISRG,CYBR,PANW,JD,GILD,JUNO,KITE,BLUE,MSFT,CSCO,NFLX,GOOGL";/
-        string tickers = @"SPY,AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
+        string tickers = @"MNST,SPY,AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN,
             FB,LNKD,TWTR,JD,JMEI,DATA,NOW,GILD,SPLK,TSO,
             LNG,EOG,APC,GPRO,NUAN,RCL,MCO,DFS,AXP,MA,V,GS,BAC,JPM,
             C,JUNO,KITE,BLUE,GMCR,PCYC,INCY,GEVA,ACAD,TKMR,CELG,REGN,BIIB,ICPT";
@@ -107,6 +107,7 @@ namespace NB.Core.Web.UnitTest
                 Debug.WriteLine(filestr.ToString());          
         }
 
+        //Important
         [TestMethod]
         public async Task YahooHistoryCvsDownloaderDataAnalysisTest()
         {
@@ -119,8 +120,8 @@ namespace NB.Core.Web.UnitTest
                     var setting = new YahooHistoryCsvSetting(ticker, -100);
                     var downloader = new YahooHistoryCsvDownloader(setting);
                     var data = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
-                  
-                    DateTime endDate = new DateTime(2015, 1, 29);//DateTime.Now.AddDays(-100);
+
+                    DateTime endDate = DateTime.Now;// new DateTime(2015, 1, 29);//DateTime.Now.AddDays(-100);
                     DateTime startDate = endDate.AddDays(-72);//DateTime.Now.AddDays(-100);
                     var filterData = data.Where(point => point.Timestamp >= startDate && point.Timestamp <= endDate).ToList();
                     PriceStatisticsAggregate analysis = new PriceStatisticsAggregate(setting.Ticker, filterData);
@@ -640,15 +641,36 @@ namespace NB.Core.Web.UnitTest
         {
             var symbles = MyHelper.GetStringToken(tickers, new string[] { ";", "," });////new string[] {"AAPL", "CSCO", "ACAD", "SGEN", "GOOGL"};
             var context = new StockContext(symbles);
+            Console.WriteLine("Ticker : next year growth  |  current divergence from 5 yrs PE | next yr divergence from 5 yrs PE");
 
-            var sector = context.SectorByTicker("AAPL");
-            var industry = context.IndustryByTicker("AAPL");
-            var equity = context.EquityByTicker("AAPL");
+            foreach (var ticker in symbles)
+            {
+                if (!index.Contains(ticker))
+                {
+                    try
+                    {
+                        //await context.PopulateMorningStarValuationDataPoint(ticker);
+                        //await context.PopulateNasdaqValuationDataPoint(ticker);
+                        //await context.PopulateYahooValuationDataPoint(ticker);
+                        var sector = context.SectorByTicker(ticker);
+                        var industry = context.IndustryByTicker(ticker);
+                        var equity = context.EquityByTicker(ticker);
 
-            var fiveAvgPE = context.CurrentMorningStarValuationMetric.FiveYearsAvgPE;
-            var currentPE = context.CurrentMorningStarValuationMetric.CurrentPE;
-            var forwardPE = context.ForwardMorningStarValuationMetric.ForwardPE;
-            var growth = currentPE / forwardPE - 1;
+                        var morningStarMetric = context.MorningStarValuationMetric(ticker);
+                        var fiveAvgPE = morningStarMetric.CurrentValuation.FiveYearsAvgPE;
+                        var currentPE = morningStarMetric.CurrentValuation.CurrentPE;
+                        var forwardPE = morningStarMetric.ForwardValuation.ForwardPE;
+                        var growth = currentPE / forwardPE - 1;
+                        var divergence = currentPE / fiveAvgPE ;
+                        var nextYearDivergence = forwardPE / fiveAvgPE;
+                        Console.WriteLine("{0}  :    {1:p}          |              {2:p}                   |        {3:p}", ticker, growth, divergence, nextYearDivergence);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ticker + " " + ex.InnerException);
+                    }
+                }                
+            }
             var bondRate = await DownloadHelper.GetRiskFreeRate();
 
         }

@@ -25,6 +25,7 @@ namespace NB.Core.Web.Models
         // Stock Correlation
         // Map (GS opinion manual set)
         string[] _tickers;
+        string _index = @"SPY,IWM,TQQQ,BIB,CURE,XLE,XLF,EEM,FXI,RTH, XTN";
         /*
          Yahoo Sector, Industry ValuationDataPoint
          MorningStar ValudationDataPoint Sector, Current Forward
@@ -41,7 +42,7 @@ namespace NB.Core.Web.Models
         public StockContext(params string[] tickers)
         {
             _tickers = tickers;
-            Parallel.ForEach(tickers, new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount}, ticker =>
+            Parallel.ForEach(tickers, new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount }, ticker =>
             {
                 Task taskYahoo = null;
                 Task taskNasdaq = null;
@@ -66,15 +67,20 @@ namespace NB.Core.Web.Models
                     _exceptions.Enqueue(ticker + " : nasdaq 404");
                 }
 
-                try
+                if (!_index.Contains(ticker))
                 {
-                    taskMorningStar = this.PopulateMorningStarValuationDataPoint(ticker);
+                    try
+                    {
+                        taskMorningStar = this.PopulateMorningStarValuationDataPoint(ticker);
+                    }
+                    catch (Exception ex)
+                    {
+                        var msg = ex.Message;
+                        _exceptions.Enqueue(ticker + " : morningstar 404");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    var msg = ex.Message;
-                    _exceptions.Enqueue(ticker + " : morningstar 404");
-                }
+                else
+                    taskMorningStar = Task.FromResult(0);
 
                 Task.WaitAll(taskYahoo, taskNasdaq, taskMorningStar);
             });                      
@@ -86,14 +92,11 @@ namespace NB.Core.Web.Models
 
         MoringStartValuationAggregate _morningStarValuationMetric;
 
-        public MorningStarValuation CurrentMorningStarValuationMetric
+        public MoringStartValuationAggregate MorningStarValuationMetric(string ticker)
         {
-            get { return _morningStarValuationMetric.CurrentValuation; }
-        }
-
-        public MorningStarValuation ForwardMorningStarValuationMetric
-        {
-            get { return _morningStarValuationMetric.ForwardValuation; }
+            if (!_morningStar.ContainsKey(ticker))
+                PopulateMorningStarValuationDataPoint(ticker).Wait();
+            return _morningStar[ticker]; 
         }
 
         public ValuationDataPoint SectorByTicker(string ticker)        
