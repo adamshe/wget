@@ -10,7 +10,7 @@ CREATE TABLE dbo.EarningForecast(
     [Consensus] [nvarchar](max) NULL,
     [High] [decimal](18, 2) NULL,
     [Low] [decimal](18, 2) NULL,
-    [Estimates] [decimal](18, 2) NULL,
+    [Estimates] [int] NULL,
     [ReviseUps] [int] NULL,
     [ReviseDowns] [int] NULL,
     [CreationDate] [datetime] default GETDATE(),

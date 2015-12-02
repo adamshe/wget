@@ -1,0 +1,7 @@
+﻿select Ticker, Frequency, FiscalEnd,count(1) from dbo.EarningForecast
+where frequency = 'Yearly'
+group by Ticker, Frequency, FiscalEnd
+having count(1) > 1
+
+select * from dbo.EarningForecast
+where frequency = 'Yearly'
