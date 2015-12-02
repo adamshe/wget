@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
+using NB.Core.Web.Constants;
 
 namespace NB.Core.Web.DownloadClient
 {
@@ -45,17 +46,22 @@ namespace NB.Core.Web.DownloadClient
 
                 var symbol = Regex.Match(content, pattern).Groups[1].Value;
                 var resultNode = XPath.GetElement("//table", year);
-                ParseTable(yearly, resultNode, symbol, "");
+                ParseTable(yearly, resultNode, symbol, "", () => CreateData(Frequency.Yearly));
 
                 resultNode = XPath.GetElement("//table", quarter);
-                ParseTable(quarterly, resultNode, symbol, "");
+                ParseTable(quarterly, resultNode, symbol, "", () => CreateData(Frequency.Quarterly));
 
                 return new NasdaqEarningForecastAggregate(yearly.ToArray(), quarterly.ToArray(), ticker);
             }
             return null;
         }
 
-        private static void ParseTable(List<NasdaqEarningForecastData> yearly, XParseElement sourceNode, string symbol, string xPath)
+        private NasdaqEarningForecastData CreateData(string frequency)
+        {
+            return new NasdaqEarningForecastData  {Frequency = frequency};
+        }
+
+        private static void ParseTable(List<NasdaqEarningForecastData> yearly, XParseElement sourceNode, string symbol, string xPath, Func<NasdaqEarningForecastData> createData)
         {
             var resultNode = sourceNode;
             if (!(string.IsNullOrWhiteSpace(xPath) || string.IsNullOrEmpty(xPath)))
@@ -73,7 +79,7 @@ namespace NB.Core.Web.DownloadClient
                         {
                             XParseElement tempNode = null;
 
-                            var data = new NasdaqEarningForecastData();
+                            var data = createData();//new NasdaqEarningForecastData();
                             data.Ticker = symbol;
                             tempNode = XPath.GetElement("/td[1]", node);
                             if (tempNode != null)

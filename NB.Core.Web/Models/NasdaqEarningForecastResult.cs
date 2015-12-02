@@ -134,6 +134,9 @@ namespace NB.Core.Web.Models
             set;
         }
 
+        [StoredAs("Frequency")]
+        public string Frequency { get; set; }
+
         [StoredAs("FiscalEnd")]
         public string FiscalEnd
         {
@@ -190,7 +193,7 @@ namespace NB.Core.Web.Models
             set { _numOfrevisionDown = value; }
         }
 
-       
+        
 
         public static bool operator == (NasdaqEarningForecastData a, NasdaqEarningForecastData b)
         {

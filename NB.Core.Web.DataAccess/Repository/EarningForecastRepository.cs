@@ -3,7 +3,9 @@ using MicroOrm.Pocos.SqlGenerator;
 using NB.Core.Web.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,44 +15,70 @@ using Dapper;
 namespace NB.Core.Web.DataAccess.Repository
 {
     //DataRepository<NasdaqEarningForecastData>, IDataRepository<NasdaqEarningForecastData>
-    public class EarningForecastRepository : DataConnection, IEventSourceRepository<NasdaqEarningForecastData>
+    public class EarningForecastRepository : IEventSourceRepository<NasdaqEarningForecastData>
     {
-        //public EarningForecastRepository(IDbConnection connection, ISqlGenerator<NasdaqEarningForecastData> sqlGenerator)
-        //    : base (connection, sqlGenerator)
-        public EarningForecastRepository(IDbConnection connection) : base(connection)	
-        {
+        private DbProviderFactory _factory;
+        private string _connectionString;
 
+        public EarningForecastRepository(string database)
+        {
+            var setting = ConfigurationManager.ConnectionStrings[database];
+            _factory = DbProviderFactories.GetFactory(setting.ProviderName);
+            _connectionString = setting.ConnectionString;
         }
 
-        public void Insert (NasdaqEarningForecastData data)
+        private IDbConnection GetConnection()
         {
+            IDbConnection connection = _factory.CreateConnection();
+            connection.ConnectionString = _connectionString;
+            connection.Open();
 
-        }
+            return connection;
+        }      
 
         public IQueryable<NasdaqEarningForecastData> GetAll()
         {
-            var sql = SqlStatmentFactory.SqlStatment.GetSelectAll();
-            return Connection.Query<NasdaqEarningForecastData>(sql).AsQueryable();
+            var sql = SqlStatmentFactory.NasdaqEarningForecastDataSqlStatment.GetSelectAll();
+            using (var connection = GetConnection())
+            {
+                return connection.Query<NasdaqEarningForecastData>(sql).AsQueryable();
+            }
         }
 
         public IEnumerable<NasdaqEarningForecastData> GetByTicker(string ticker)
         {
-            var sql = SqlStatmentFactory.SqlStatment.GetSelect(new { Ticker = ticker });
-            return Connection.Query<NasdaqEarningForecastData>(sql);
+            var sql = SqlStatmentFactory.NasdaqEarningForecastDataSqlStatment.GetSelect(new { Ticker = ticker });
+            using (var connection = GetConnection())
+            {
+                return connection.Query<NasdaqEarningForecastData>(sql);
+            }
+        }
+
+        public bool Save(IEnumerable<NasdaqEarningForecastData> forecasts)
+        {
+            var sql = SqlStatmentFactory.NasdaqEarningForecastDataSqlStatment.GetInsert();
+            using (var connection = GetConnection())
+            {
+                var num = connection.Execute(sql, forecasts);
+                return -1 < num;
+            }
         }
 
         public bool Add(NasdaqEarningForecastData entity)
         {
-            var sql = SqlStatmentFactory.SqlStatment.GetInsert();
-            var newId = Connection.Query<int>(sql, entity).Single();
-            var inserted = newId > 0;
-
-            if (inserted)
+            var sql = SqlStatmentFactory.NasdaqEarningForecastDataSqlStatment.GetInsert();
+            using (var connection = GetConnection())
             {
-                entity.Id = (int)newId;
-            }
+                var newId = connection.Query<int>(sql, entity).Single();
+                var inserted = newId > 0;
 
-            return inserted;
+                if (inserted)
+                {
+                    entity.Id = (int) newId;
+                }
+
+                return inserted;
+            }
 
         }
 

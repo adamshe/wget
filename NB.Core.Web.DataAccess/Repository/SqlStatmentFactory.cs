@@ -19,12 +19,17 @@ namespace NB.Core.Web.DataAccess.Repository
             //DI.Container.RegisterType<SqlGenerator<User>>().As<ISqlGenerator<User>>().Singleton();
         }
 
-        public static ISqlGenerator<NasdaqEarningForecastData> SqlStatment
+        public static ISqlGenerator<NasdaqEarningForecastData> NasdaqEarningForecastDataSqlStatment
         {
             get
             {
                 return container.Locate<ISqlGenerator<NasdaqEarningForecastData>>();
             }
         }
+
+        //public static ISqlGenerator<T> GetSqlStatment<T>() where T : new()
+        //{
+        //    return _container.Locate<ISqlGenerator<T>>();
+        //}
     }
 }

@@ -59,6 +59,5 @@ namespace wget
         {
             get { return _targetFile; }
         }
-    }
-    }
+    }    
 }

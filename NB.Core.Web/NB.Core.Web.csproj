@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\Frequency.cs" />
     <Compile Include="Constants\Yahoo.cs" />
     <Compile Include="DownloadClient\AnalystRatingsDownloader.cs" />
     <Compile Include="DownloadClient\CpiDataDownloader.cs" />

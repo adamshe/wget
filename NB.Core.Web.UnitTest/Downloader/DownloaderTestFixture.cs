@@ -20,6 +20,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Xml;
+using NB.Core.Web.DataAccess.Constants;
 
 namespace NB.Core.Web.UnitTest
 {
@@ -32,9 +33,9 @@ namespace NB.Core.Web.UnitTest
         string[] friendsEmail = { "adamshe@gmail.com" };//"laofengs@gmail.com", 
         //"SPY,GMCR,AAPL,AMZN,PCLN,TRIP,EXPE,ISRG,CYBR,PANW,JD,GILD,JUNO,KITE,BLUE,MSFT,CSCO,NFLX,GOOGL";/
         string tickers =  @"LVLT,MNST,SPY,AAPL,YHOO,MSFT,GOOGL,CSCO,BRCM,INTC,CYBR,BA,ADBE,HDP,NEWR,WYNN,LVS,TSLA,NFLX,PCLN,AMZN, 
-            FB,LNKD,TWTR,JD,JMEI,DATA,NOW,GILD,SPLK,TSO,
+            FB,LNKD,TWTR,CTRP,JD,JMEI,DATA,NOW,GILD,SPLK,TSO,NUAN,FCX,FDML,SHW,
             LNG,EOG,APC,GPRO,NUAN,RCL,MCO,DFS,AXP,MA,V,GS,BAC,JPM,
-            C,JUNO,KITE,BLUE,GMCR,PCYC,INCY,GEVA,ACAD,TKMR,CELG,REGN,BIIB,ICPT, TQQQ,BIB,CURE";
+            C,JUNO,KITE,BLUE,GMCR,PCYC,INCY,GEVA,ACAD,TKMR,CELG,REGN,BIIB,ICPT,TQQQ,BIB,CURE,KNDI,VRX";
                           
 
         string index = @"SPY,IWM,TQQQ,BIB,CURE,XLE,XLF,EEM,FXI,RTH, XTN";//TZA,TNA,
@@ -111,6 +112,7 @@ namespace NB.Core.Web.UnitTest
         [TestMethod]
         public async Task YahooHistoryCvsDownloaderDataAnalysisTest()
         {
+            //tickers
             var allTickers = tickers.Split(new char[]{','},StringSplitOptions.RemoveEmptyEntries);
             List<PriceStatisticsAggregate> list = new List<PriceStatisticsAggregate>();
             foreach (var ticker in allTickers)
@@ -353,7 +355,7 @@ namespace NB.Core.Web.UnitTest
         [TestMethod]
         public async Task GetNasdaqHoldingDownloadTest()
         {
-            var setting = new NasdaqHoldingSetting("SLXP");
+            var setting = new NasdaqHoldingSetting("VRX");
             var downloader = new NasdaqHoldingDownloader(setting);
             var result = await downloader.PostDownload( 
                 new Dictionary<string,string>{{"Command","marketvalue" }, {"sortorder", "1"}, {"page","1"}});
@@ -492,54 +494,35 @@ namespace NB.Core.Web.UnitTest
         }
 
         [TestMethod]
+        public void GetRepo()
+        {
+            var repo = new EarningForecastRepository(DataBaseNames.DbEarnings);
+            Assert.IsNotNull(repo);
+        }
+
+        [TestMethod]
         public async Task GetNasdaqEarningForcast()
         {
-            var setting = new NasdaqEarningForecastSetting("LNG");
+            var setting = new NasdaqEarningForecastSetting("NUAN");
             var downloader = new NasdaqEarningForecastDownloader(setting);
             var result = await downloader.BatchDownloadObjectsStreamTaskAsync(setting.GetUrls(tickers)).ConfigureAwait(false);
-         //   var item = await downloader.DownloadObjectStreamTaskAsync().ConfigureAwait(false);
-            //foreach (var q in result.QuarterlyEarningForecasts)
-            //{
-            //    Console.WriteLine(q..ConsensusEpsForecast)
-            //}
-            //var serializer = new JavaScriptSerializer();
-            //String json = serializer.Serialize(result);
-            //Debug.WriteLine(json);
-            //var column1 = "Ticker"; var col1With = column1.Length + 2;
-            //var column2 = "Q2Q Growth"; var col2With = column2.Length + 8;
-            //var column3 = "Y2Y Growth"; var col3With = column3.Length + 8;
-            //Console.Write(column1.PadRight(col1With, '.'));
-            //Console.Write(column2.PadLeft(col2With, '.'));
-            //Console.WriteLine(column3.PadLeft(col3With, '.'));
+
             var orderResult = result.OrderByDescending(item => { if (item.YearlyEarningForecasts.Length == 0) return double.NaN; return item.YearlyEarningForecasts.Last().ConsensusEpsForecast; });
+            var repo = new EarningForecastRepository(DataBaseNames.DbEarnings);
             foreach (var item in orderResult)
             {
                 try
                 {
-                    Console.WriteLine(item.ToString());
-                    //Console.Write(item.Ticker.PadRight(col1With, '.'));
-                    //Console.Write(item.QuartylyEarningGrowth.ToString("p").PadLeft(col2With,'.'));
-                    //Console.WriteLine(item.QuartylyEarningGrowth.ToString("p").PadLeft(col3With, '.'));
-                //{
-                //    Console.WriteLine("ticker: {0}          q2q growth: {1}                    y2y growth: {2}", 
-                //        item.Ticker.PadRight(6), 
-                //        item.QuartylyEarningGrowth.ToString("p").PadLeft(25), 
-                //        item.YearlyEarningGrowth.ToString("p").PadLeft(25));
+                    repo.Save(item.QuarterlyEarningForecasts);
+                    repo.Save(item.YearlyEarningForecasts);
+                    Console.WriteLine(item.ToString());        
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(item.Ticker + "  " + ex.Message);
                 }
-                 //foreach (var y in item.YearlyEarningForecasts)
-                 //{
-                 //    PrintProperties(y, 0);
-                 //}
-
-                 //foreach (var q in item.QuarterlyEarningForecasts)
-                 //{
-                 //    PrintProperties(q, 0);
-                 //}
             }
+           
         }
 
         [TestMethod]
